@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import top.rrricardo.postcalendarbackend.mappers.UserMapper;
 import top.rrricardo.postcalendarbackend.models.User;
+import top.rrricardo.postcalendarbackend.utils.ResponseUtil;
 
 import java.util.List;
 
@@ -21,15 +22,15 @@ public class UserController {
     public ResponseEntity<List<User>> getUsers() {
         var users = userMapper.getUsers();
 
-        return ResponseEntity.ok(users);
+        return ResponseUtil.ok(users);
     }
 
     @PostMapping("/")
     public ResponseEntity<User> createUser(@RequestBody User user) {
-        var result = userMapper.createUser(user);
-        System.out.println(result);
+        userMapper.createUser(user);
 
-        return new ResponseEntity<>(user, HttpStatus.CREATED);
+        // Mybatis框架会自动设置自增的ID值
+        return ResponseUtil.created(user);
     }
 
     @GetMapping("/{id}")
@@ -37,23 +38,23 @@ public class UserController {
         var user = userMapper.getUser(id);
 
         if (user == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return ResponseUtil.notFound();
         }
 
-        return ResponseEntity.ok(user);
+        return ResponseUtil.ok(user);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<User> update(@PathVariable(value = "id") int id,
-                                       @RequestBody User user) {
+                                       @RequestBody User user) throws NullPointerException {
         if (id != user.getId()) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return ResponseUtil.badRequest();
         }
 
         var oldUser = getUser(id);
         if (oldUser == null) {
             // 用户不存在
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return ResponseUtil.notFound();
         }
 
         userMapper.updateUser(user);
@@ -64,13 +65,19 @@ public class UserController {
             throw new NullPointerException();
         }
 
-        return new ResponseEntity<>(newUser, HttpStatus.NO_CONTENT);
+        return ResponseUtil.ok(newUser);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<User> deleteUser(@PathVariable(value = "id") int id) {
+        var user = userMapper.getUser(id);
+
+        if (user == null) {
+            return ResponseUtil.notFound();
+        }
+
         userMapper.deleteUser(id);
 
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return ResponseUtil.noContent();
     }
 }
