@@ -9,9 +9,11 @@ import java.util.List;
 public interface UserMapper {
     List<User> getUsers();
 
+    User getUser(int id);
+
     int createUser(User user);
 
     int updateUser(User user);
 
-    int deleteUser(User user);
+    int deleteUser(int id);
 }

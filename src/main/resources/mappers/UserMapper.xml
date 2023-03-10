@@ -6,23 +6,25 @@
         select * from `users`
     </select>
 
-    <insert id="createUser" parameterType="User">
+    <select id="getUser" parameterType="int" resultType="User">
+        select * from `users` where id = #{id}
+    </select>
+
+    <insert id="createUser" parameterType="User" useGeneratedKeys="true" keyProperty="id">
         insert into `users` (`username`,
-                             `password`,
-                             `permission`
+                             `password`
         ) values (
-                  #{user.username},
-                  #{user.password},
-                  #{user.permission})
+                  #{username},
+                  #{password})
     </insert>
 
     <update id="updateUser" parameterType="User">
-        update `users` set username=#{user.username}, password=#{user.password}, permission=#{user.permission}
-        where id=#{user.id}
+        update `users` set username=#{username}, password=#{password}
+        where id=#{id}
     </update>
 
     <delete id="deleteUser" parameterType="int">
-        delete from `users` where id=#{user.id}
+        delete from `users` where id=#{id}
     </delete>
 
 </mapper>
