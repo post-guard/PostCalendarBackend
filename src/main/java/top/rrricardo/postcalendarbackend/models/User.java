@@ -1,8 +1,8 @@
 package top.rrricardo.postcalendarbackend.models;
 
-
 public class User {
     private int id;
+    private String emailAddress;
     private String username;
     private String password;
 
@@ -20,11 +20,27 @@ public class User {
         return username;
     }
 
+    public void setUsername(String emailAddress) {
+        this.emailAddress = emailAddress;
+    }
+
+    public String getEmailAddress() {
+        return emailAddress;
+    }
+
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
+    }
+
     /**
      * 获得用户密码
      */
     public String getPassword() {
         return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
 
