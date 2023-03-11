@@ -6,6 +6,12 @@ public class User {
     private String username;
     private String password;
 
+    public User(String emailAddress, String username, String password) {
+        this.emailAddress = emailAddress;
+        this.username = username;
+        this.password = password;
+    }
+
     /**
      * 获得用户id
      */

@@ -1,9 +1,8 @@
-package top.rrricardo.postcalendarbackend;
+package top.rrricardo.postcalendarbackend.utils;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.Assert;
-import top.rrricardo.postcalendarbackend.utils.EncryptSha256Util;
 
 @SpringBootTest
 public class EncryptSha256UtilTest {
