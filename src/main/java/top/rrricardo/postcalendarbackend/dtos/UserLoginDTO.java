@@ -1,9 +1,11 @@
 package top.rrricardo.postcalendarbackend.dtos;
 
+import java.io.Serializable;
+
 /**
  * 用户登录时的JSON模型
  */
-public class UserLoginDTO {
+public class UserLoginDTO implements Serializable {
     private String emailAddress;
 
     private String password;

@@ -2,13 +2,14 @@ package top.rrricardo.postcalendarbackend.dtos;
 
 import top.rrricardo.postcalendarbackend.models.User;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * 用户DTO对象
  */
-public class UserDTO {
+public class UserDTO implements Serializable {
     private int id;
     private String username;
     private String emailAddress;
