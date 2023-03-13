@@ -12,14 +12,16 @@
 
     <insert id="createUser" parameterType="User" useGeneratedKeys="true" keyProperty="id">
         insert into `users` (`username`,
+                             `emailAddress`,
                              `password`
         ) values (
                   #{username},
+                  #{emailAddress},
                   #{password})
     </insert>
 
     <update id="updateUser" parameterType="User">
-        update `users` set username=#{username}, password=#{password}
+        update `users` set username=#{username}, password=#{password}, emailAddress=#{emailAddress}
         where id=#{id}
     </update>
 
