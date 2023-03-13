@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import top.rrricardo.postcalendarbackend.dtos.UserDTO;
 import top.rrricardo.postcalendarbackend.models.User;
-import top.rrricardo.postcalendarbackend.models.UserLogin;
+import top.rrricardo.postcalendarbackend.dtos.UserLoginDTO;
 import top.rrricardo.postcalendarbackend.services.UserService;
 import top.rrricardo.postcalendarbackend.utils.ResponseUtil;
 
@@ -21,7 +21,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserDTO> login(@RequestBody UserLogin userLogin) {
+    public ResponseEntity<UserDTO> login(@RequestBody UserLoginDTO userLogin) {
         if (userLogin.getEmailAddress() == null || userLogin.getPassword() == null) {
             return ResponseUtil.badRequest();
         }

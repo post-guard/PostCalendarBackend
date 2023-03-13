@@ -1,9 +1,9 @@
-package top.rrricardo.postcalendarbackend.models;
+package top.rrricardo.postcalendarbackend.dtos;
 
 /**
  * 用户登录时的JSON模型
  */
-public class UserLogin {
+public class UserLoginDTO {
     private String emailAddress;
 
     private String password;

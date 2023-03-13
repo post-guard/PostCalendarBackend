@@ -12,5 +12,7 @@ mybatis:
   type-aliases-package: top.rrricardo.postcalendarbackend.models
 user:
   password-salt: cvmnasdvnjcnvkmdfvhldfckvndvmbnklsdfgnvjkxc
-
+  rootUserEmailAddress: root@root.org
+  rootUsername: root
+  rootPassword: root
 
