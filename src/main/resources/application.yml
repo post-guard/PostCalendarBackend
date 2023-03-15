@@ -16,7 +16,7 @@ user:
   rootUsername: root
   rootPassword: root
   jwt:
-    secret: ascnkuxvmnwerkjvfxckvnkujsefnv
+    secret: ascnkuxvmnwerkjvfxckvnkujsefnvxcvsdfjkxcvjnksdjnxcvjnsd
     lifetime: 7
     issuer: PostCalendarBackend
 

@@ -9,7 +9,6 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import top.rrricardo.postcalendarbackend.annotations.Authorize;
 import top.rrricardo.postcalendarbackend.dtos.ResponseDTO;
 import top.rrricardo.postcalendarbackend.dtos.UserDTO;
-import top.rrricardo.postcalendarbackend.enums.UserPermission;
 import top.rrricardo.postcalendarbackend.services.JwtService;
 
 @Component
@@ -37,7 +36,7 @@ public class AuthorizeInterceptor implements HandlerInterceptor {
         // 验证是否携带令牌
         var tokenHeader = request.getHeader(jwtService.header);
         if (tokenHeader == null || !tokenHeader.startsWith(jwtService.tokenPrefix)) {
-            var responseDTO = new ResponseDTO<UserDTO>("没有携带令牌");
+            var responseDTO = new ResponseDTO<UserDTO>("No token provided");
 
             response.setStatus(401);
             response.getWriter().println(responseDTO);
@@ -47,12 +46,12 @@ public class AuthorizeInterceptor implements HandlerInterceptor {
 
         try {
             var claims = jwtService.parseJwtToken(tokenHeader);
-            var permission = claims.get("permission", UserPermission.class);
+            var permission = claims.get("permission", Integer.class);
 
-            if (permission.getCode() > authorize.permission().getCode()) {
+            if (permission >= authorize.permission().getCode()) {
                 return true;
             } else {
-                var responseDTO = new ResponseDTO<UserDTO>("没有对应的权限");
+                var responseDTO = new ResponseDTO<UserDTO>("No permission enhanced");
 
                 response.setStatus(403);
                 response.getWriter().println(responseDTO);

@@ -18,10 +18,6 @@ import java.util.Date;
 
 @Service
 public class JwtServiceImpl implements JwtService {
-
-    @Value("${user.jwt.secret}")
-    private String secret;
-
     @Value("${user.jwt.lifetime}")
     private long ttl;
 
@@ -31,7 +27,7 @@ public class JwtServiceImpl implements JwtService {
     private final Logger logger;
     private final Key key;
 
-    public JwtServiceImpl() {
+    public JwtServiceImpl(@Value("${user.jwt.secret}") String secret) {
         logger = LoggerFactory.getLogger(JwtServiceImpl.class);
         key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
@@ -47,7 +43,7 @@ public class JwtServiceImpl implements JwtService {
                 .setIssuer(issuer)
                 .setIssuedAt(data)
                 .setExpiration(expireData)
-                .claim("permission", UserPermission.USER)
+                .claim("permission", UserPermission.USER.getCode())
                 .signWith(key)
                 .compact();
 
@@ -61,7 +57,7 @@ public class JwtServiceImpl implements JwtService {
             return Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()
-                    .parseClaimsJwt(token.replace(tokenPrefix, ""))
+                    .parseClaimsJws(token.replace(tokenPrefix, ""))
                     .getBody();
         } catch (JwtException e) {
             logger.info("Validate jwt token failed: " + e.getMessage());
