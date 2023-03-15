@@ -15,4 +15,9 @@ user:
   rootUserEmailAddress: root@root.org
   rootUsername: root
   rootPassword: root
+  jwt:
+    secret: ascnkuxvmnwerkjvfxckvnkujsefnv
+    lifetime: 7
+    issuer: PostCalendarBackend
+
 
