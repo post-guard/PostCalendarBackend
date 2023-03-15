@@ -9,20 +9,25 @@ import top.rrricardo.postcalendarbackend.dtos.ResponseDTO;
 import top.rrricardo.postcalendarbackend.dtos.UserDTO;
 import top.rrricardo.postcalendarbackend.models.User;
 import top.rrricardo.postcalendarbackend.dtos.UserLoginDTO;
+import top.rrricardo.postcalendarbackend.services.JwtService;
 import top.rrricardo.postcalendarbackend.services.UserService;
 import top.rrricardo.postcalendarbackend.utils.ControllerBase;
+
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController extends ControllerBase {
     private final UserService userService;
+    private final JwtService jwtService;
 
-    public AuthController(UserService userService) {
+    public AuthController(UserService userService, JwtService jwtService) {
         this.userService = userService;
+        this.jwtService = jwtService;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ResponseDTO<UserDTO>> login(@RequestBody UserLoginDTO userLogin) {
+    public ResponseEntity<ResponseDTO<HashMap<String, Object>>> login(@RequestBody UserLoginDTO userLogin) {
         if (userLogin.getEmailAddress() == null || userLogin.getPassword() == null) {
             return badRequest();
         }
@@ -32,7 +37,13 @@ public class AuthController extends ControllerBase {
         if (result == null) {
             return notFound("用户不存在");
         } else {
-            return ok("登录成功", new UserDTO(result));
+            var map = new HashMap<String, Object>();
+            map.put("id", result.getId());
+            map.put("username", result.getUsername());
+            map.put("emailAddress", result.getEmailAddress());
+            map.put("token", jwtService.generateJwtToken(result));
+
+            return ok("登录成功", map);
         }
     }
 

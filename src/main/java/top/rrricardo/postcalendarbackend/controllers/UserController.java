@@ -2,8 +2,10 @@ package top.rrricardo.postcalendarbackend.controllers;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import top.rrricardo.postcalendarbackend.annotations.Authorize;
 import top.rrricardo.postcalendarbackend.dtos.ResponseDTO;
 import top.rrricardo.postcalendarbackend.dtos.UserDTO;
+import top.rrricardo.postcalendarbackend.enums.UserPermission;
 import top.rrricardo.postcalendarbackend.mappers.UserMapper;
 import top.rrricardo.postcalendarbackend.models.User;
 import top.rrricardo.postcalendarbackend.utils.ControllerBase;
@@ -20,21 +22,15 @@ public class UserController extends ControllerBase {
     }
 
     @GetMapping("/")
+    @Authorize(permission = UserPermission.ADMIN)
     public ResponseEntity<ResponseDTO<List<UserDTO>>> getUsers() {
         var users = userMapper.getUsers();
 
         return ok(UserDTO.arrayOf(users));
     }
 
-    @PostMapping("/")
-    public ResponseEntity<ResponseDTO<UserDTO>> createUser(@RequestBody User user) {
-        userMapper.createUser(user);
-
-        // Mybatis框架会自动设置自增的ID值
-        return created(new UserDTO(user));
-    }
-
     @GetMapping("/{id}")
+    @Authorize(permission = UserPermission.USER)
     public ResponseEntity<ResponseDTO<UserDTO>> getUser(@PathVariable(value = "id") int id) {
         var user = userMapper.getUser(id);
 
@@ -46,6 +42,7 @@ public class UserController extends ControllerBase {
     }
 
     @PutMapping("/{id}")
+    @Authorize(permission = UserPermission.ADMIN)
     public ResponseEntity<ResponseDTO<UserDTO>> update(@PathVariable(value = "id") int id,
                                        @RequestBody User user) throws NullPointerException {
         if (id != user.getId()) {
@@ -70,6 +67,7 @@ public class UserController extends ControllerBase {
     }
 
     @DeleteMapping("/{id}")
+    @Authorize(permission = UserPermission.ADMIN)
     public ResponseEntity<ResponseDTO<UserDTO>> deleteUser(@PathVariable(value = "id") int id) {
         var user = userMapper.getUser(id);
 
