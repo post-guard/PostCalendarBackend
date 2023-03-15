@@ -9,11 +9,13 @@ import java.util.List;
 public interface UserMapper {
     List<User> getUsers();
 
-    User getUser(int id);
+    User getUserById(int id);
 
-    int createUser(User user);
+    User getUserByEmail(String emailAddress);
 
-    int updateUser(User user);
+    void createUser(User user);
 
-    int deleteUser(int id);
+    void updateUser(User user);
+
+    void deleteUser(int id);
 }

@@ -32,7 +32,7 @@ public class UserController extends ControllerBase {
     @GetMapping("/{id}")
     @Authorize(permission = UserPermission.USER)
     public ResponseEntity<ResponseDTO<UserDTO>> getUser(@PathVariable(value = "id") int id) {
-        var user = userMapper.getUser(id);
+        var user = userMapper.getUserById(id);
 
         if (user == null) {
             return notFound("用户不存在");
@@ -57,7 +57,7 @@ public class UserController extends ControllerBase {
 
         userMapper.updateUser(user);
 
-        var newUser = userMapper.getUser(id);
+        var newUser = userMapper.getUserById(id);
 
         if (newUser == null) {
             throw new NullPointerException();
@@ -69,7 +69,7 @@ public class UserController extends ControllerBase {
     @DeleteMapping("/{id}")
     @Authorize(permission = UserPermission.ADMIN)
     public ResponseEntity<ResponseDTO<UserDTO>> deleteUser(@PathVariable(value = "id") int id) {
-        var user = userMapper.getUser(id);
+        var user = userMapper.getUserById(id);
 
         if (user == null) {
             return notFound("用户不存在");

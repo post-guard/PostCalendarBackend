@@ -21,15 +21,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User userLogin(String emailAddress, String password) {
-        var users = userMapper.getUsers();
-
-        User result = null;
-        for(var user: users) {
-            if (user.getEmailAddress().equals(emailAddress)) {
-                result = user;
-                break;
-            }
-        }
+        User result = userMapper.getUserByEmail(emailAddress);
 
         if (result == null) {
             return null;
@@ -44,15 +36,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean userRegister(User user) {
-        var users = userMapper.getUsers();
-
-        User result = null;
-        for(var item: users) {
-            if (item.getEmailAddress().equals(user.getEmailAddress())) {
-                result = item;
-                break;
-            }
-        }
+        User result = userMapper.getUserByEmail(user.getEmailAddress());
 
         if (result != null) {
             // 电子邮件已经被使用
