@@ -1,6 +1,6 @@
 package top.rrricardo.postcalendarbackend.annotations;
 
-import top.rrricardo.postcalendarbackend.enums.UserPermission;
+import top.rrricardo.postcalendarbackend.enums.AuthorizePolicy;
 
 import java.lang.annotation.*;
 
@@ -9,5 +9,5 @@ import java.lang.annotation.*;
 @Documented
 @Inherited
 public @interface Authorize {
-    UserPermission permission() default UserPermission.USER;
+    AuthorizePolicy policy() default AuthorizePolicy.ONLY_LOGIN;
 }

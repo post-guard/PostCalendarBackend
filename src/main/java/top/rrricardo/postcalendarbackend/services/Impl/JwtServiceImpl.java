@@ -43,7 +43,8 @@ public class JwtServiceImpl implements JwtService {
                 .setIssuer(issuer)
                 .setIssuedAt(data)
                 .setExpiration(expireData)
-                .claim("permission", UserPermission.USER.getCode())
+                .claim("permission", UserPermission.USER)
+                .claim("userId", user.getId())
                 .signWith(key)
                 .compact();
 

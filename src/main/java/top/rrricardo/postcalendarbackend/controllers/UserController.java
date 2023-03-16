@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import top.rrricardo.postcalendarbackend.annotations.Authorize;
 import top.rrricardo.postcalendarbackend.dtos.ResponseDTO;
 import top.rrricardo.postcalendarbackend.dtos.UserDTO;
-import top.rrricardo.postcalendarbackend.enums.UserPermission;
+import top.rrricardo.postcalendarbackend.enums.AuthorizePolicy;
 import top.rrricardo.postcalendarbackend.mappers.UserMapper;
 import top.rrricardo.postcalendarbackend.models.User;
 import top.rrricardo.postcalendarbackend.utils.ControllerBase;
@@ -22,7 +22,7 @@ public class UserController extends ControllerBase {
     }
 
     @GetMapping("/")
-    @Authorize(permission = UserPermission.ADMIN)
+    @Authorize(policy = AuthorizePolicy.ONLY_LOGIN)
     public ResponseEntity<ResponseDTO<List<UserDTO>>> getUsers() {
         var users = userMapper.getUsers();
 
@@ -30,7 +30,7 @@ public class UserController extends ControllerBase {
     }
 
     @GetMapping("/{id}")
-    @Authorize(permission = UserPermission.USER)
+    @Authorize(policy = AuthorizePolicy.ONLY_LOGIN)
     public ResponseEntity<ResponseDTO<UserDTO>> getUser(@PathVariable(value = "id") int id) {
         var user = userMapper.getUserById(id);
 
@@ -42,7 +42,7 @@ public class UserController extends ControllerBase {
     }
 
     @PutMapping("/{id}")
-    @Authorize(permission = UserPermission.ADMIN)
+    @Authorize(policy = AuthorizePolicy.CURRENT_USER)
     public ResponseEntity<ResponseDTO<UserDTO>> update(@PathVariable(value = "id") int id,
                                        @RequestBody User user) throws NullPointerException {
         if (id != user.getId()) {
@@ -67,7 +67,7 @@ public class UserController extends ControllerBase {
     }
 
     @DeleteMapping("/{id}")
-    @Authorize(permission = UserPermission.ADMIN)
+    @Authorize(policy = AuthorizePolicy.CURRENT_USER)
     public ResponseEntity<ResponseDTO<UserDTO>> deleteUser(@PathVariable(value = "id") int id) {
         var user = userMapper.getUserById(id);
 
