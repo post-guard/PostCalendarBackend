@@ -2,4 +2,42 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="top.rrricardo.postcalendarbackend.mappers.OrganizationLinkMapper">
 
+    <select id="getOrganizationLinks" resultType="OrganizationLink">
+        select * from `user-organ-link`
+    </select>
+
+    <select id="getOrganizationLinkById" parameterType="int" resultType="OrganizationLink">
+        select * from `user-organ-link` where id=#{id}
+    </select>
+
+    <select id="getOrganizationLinksByUserId" parameterType="int" resultType="Organization">
+        select a.id, a.name, a.details
+        from `organization` a
+                 join `user-organ-link` b on a.id = b.`organization-id` and b.`user-id` = #{userId}
+    </select>
+
+    <select id="getOrganizationLinksByOrganizationId" parameterType="int" resultType="User">
+        select a.id, a.username, a.emailAddress, a.password
+        from `users` a
+                 join `user-organ-link` b on a.id = b.`user-id` and b.`organization-id` = #{organizationId}
+    </select>
+
+    <insert id="createOrganizationLink" parameterType="OrganizationLink">
+        insert into `user-organ-link` (`user-id`, `organization-id`, `permission`)
+        values (#{userId},
+                #{organizationId},
+                #{permission})
+    </insert>
+
+    <update id="updateOrganizationLink" parameterType="OrganizationLink">
+        update `user-organ-link`
+        set `user-id`=#{userId},
+            `organization-id`=#{organizationId},
+            `permission`=#{permission}
+        where id = #{id}
+    </update>
+
+    <delete id="deleteOrganizationLink" parameterType="int">
+        delete from `user-organ-link` where id=#{id}
+    </delete>
 </mapper>

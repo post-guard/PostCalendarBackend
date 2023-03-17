@@ -18,7 +18,8 @@ create table if not exists `organization` (
 create table if not exists `user-organ-link` (
     `id` int not null auto_increment,
     `user-id` int not null ,
-    `organization-link` int not null ,
+    `organization-id` int not null ,
+    `permission` int not null,
     primary key (`id`)
 );
 

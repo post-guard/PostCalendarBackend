@@ -1,5 +1,6 @@
 package top.rrricardo.postcalendarbackend.mappers;
 
+import top.rrricardo.postcalendarbackend.models.Organization;
 import top.rrricardo.postcalendarbackend.models.OrganizationLink;
 import top.rrricardo.postcalendarbackend.models.User;
 
@@ -17,7 +18,7 @@ public interface OrganizationLinkMapper {
      * @param userId 指定用户ID
      * @return 组织列表
      */
-    List<OrganizationLink> getOrganizationLinksByUserId(int userId);
+    List<Organization> getOrganizationLinksByUserId(int userId);
 
     /**
      * 获得指定组织用户的用户列表
