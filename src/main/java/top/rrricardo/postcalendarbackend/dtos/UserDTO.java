@@ -20,6 +20,12 @@ public class UserDTO implements Serializable {
         this.emailAddress = user.getEmailAddress();
     }
 
+    public UserDTO(int id, String username, String emailAddress) {
+        this.id = id;
+        this.username = username;
+        this.emailAddress = emailAddress;
+    }
+
     /**
      * 创建userDTO数组的辅助函数
      * @param users 用户类型列表

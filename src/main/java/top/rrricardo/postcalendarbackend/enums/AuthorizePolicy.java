@@ -3,17 +3,27 @@ public enum AuthorizePolicy {
     /**
      * 只要登录就可以访问
      */
-    ONLY_LOGIN,
+    ONLY_LOGIN("onlyLogin"),
     /**
      * 当前用户可以访问（URL终结点包含用户ID）
      */
-    CURRENT_USER,
+    CURRENT_USER("currentUser"),
     /**
      * 用户权限超过普通管理员
      */
-    ABOVE_ADMINISTRATOR,
+    ABOVE_ADMINISTRATOR("aboveAdministrator"),
     /**
      * 用户权限超过超级管理员
      */
-    ABOVE_SUPERMAN
+    ABOVE_SUPERMAN("aboveSuperman");
+
+    private final String implementName;
+
+    AuthorizePolicy(String implementName) {
+        this.implementName = implementName;
+    }
+
+    public String getImplementName() {
+        return this.implementName;
+    }
 }

@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import top.rrricardo.postcalendarbackend.enums.UserPermission;
 import top.rrricardo.postcalendarbackend.models.User;
 import top.rrricardo.postcalendarbackend.services.JwtService;
 
@@ -43,8 +42,8 @@ public class JwtServiceImpl implements JwtService {
                 .setIssuer(issuer)
                 .setIssuedAt(data)
                 .setExpiration(expireData)
-                .claim("permission", UserPermission.USER)
                 .claim("userId", user.getId())
+                .claim("emailAddress", user.getEmailAddress())
                 .signWith(key)
                 .compact();
 
