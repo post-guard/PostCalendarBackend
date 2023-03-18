@@ -8,6 +8,7 @@ import top.rrricardo.postcalendarbackend.enums.UserPermission;
 import top.rrricardo.postcalendarbackend.exceptions.NoUserIdException;
 import top.rrricardo.postcalendarbackend.mappers.OrganizationLinkMapper;
 import top.rrricardo.postcalendarbackend.services.AuthorizeService;
+import top.rrricardo.postcalendarbackend.utils.Common;
 
 @Service("currentUser")
 public class CurrentUserAuthorizeService implements AuthorizeService {
@@ -21,9 +22,10 @@ public class CurrentUserAuthorizeService implements AuthorizeService {
 
     @Override
     public boolean authorize(UserDTO user, String requestUri) throws NoUserIdException {
-        var link = organizationLinkMapper.getOrganizationLinkByUserIdAndOrganizationId(user.getId(), 1);
+        var link = organizationLinkMapper.getOrganizationLinkByUserIdAndOrganizationId(user.getId(),
+                Common.DefaultUsersOrganizationId);
 
-        if (link.getPermission().getCode() >= UserPermission.ADMIN.getCode()) {
+        if (link.getPermissionEnum().getCode() >= UserPermission.ADMIN.getCode()) {
             // 如果请求者是管理员
             return true;
         }
@@ -32,11 +34,7 @@ public class CurrentUserAuthorizeService implements AuthorizeService {
         try {
             var id = Integer.parseInt(array[array.length - 1]);
 
-            if (id == user.getId()) {
-                return true;
-            } else {
-                return false;
-            }
+            return id == user.getId();
         } catch (NumberFormatException e) {
             logger.error("Failed to get id in uri: " + requestUri);
 

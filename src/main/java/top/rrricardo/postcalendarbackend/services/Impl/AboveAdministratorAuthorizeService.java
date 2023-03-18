@@ -5,6 +5,7 @@ import top.rrricardo.postcalendarbackend.dtos.UserDTO;
 import top.rrricardo.postcalendarbackend.enums.UserPermission;
 import top.rrricardo.postcalendarbackend.mappers.OrganizationLinkMapper;
 import top.rrricardo.postcalendarbackend.services.AuthorizeService;
+import top.rrricardo.postcalendarbackend.utils.Common;
 
 /**
  * 需要用户权限大于等于管理员的权限校验
@@ -19,8 +20,9 @@ public class AboveAdministratorAuthorizeService implements AuthorizeService {
 
     @Override
     public boolean authorize(UserDTO user, String requestUri) {
-        var link = organizationLinkMapper.getOrganizationLinkByUserIdAndOrganizationId(user.getId(), 1);
+        var link = organizationLinkMapper.getOrganizationLinkByUserIdAndOrganizationId(user.getId(),
+                Common.DefaultUsersOrganizationId);
 
-        return link.getPermission().getCode() >= UserPermission.ADMIN.getCode();
+        return link.getPermissionEnum().getCode() >= UserPermission.ADMIN.getCode();
     }
 }

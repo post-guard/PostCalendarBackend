@@ -30,11 +30,19 @@ public class OrganizationLink {
         this.organizationId = organizationId;
     }
 
-    public UserPermission getPermission() {
+    public int getPermission() {
+        return permission;
+    }
+
+    public void setPermission(int permission) {
+        this.permission = permission;
+    }
+
+    public UserPermission getPermissionEnum() {
         return UserPermission.values()[permission];
     }
 
-    public void setPermission(UserPermission permission) {
+    public void setPermissionEnum(UserPermission permission) {
         this.permission = permission.ordinal();
     }
 }

@@ -26,7 +26,7 @@
         select * from `user-organ-link` where `user-id`=#{arg0} and `organization-id`=#{arg1}
     </select>
 
-    <insert id="createOrganizationLink" parameterType="OrganizationLink">
+    <insert id="createOrganizationLink" parameterType="OrganizationLink" useGeneratedKeys="true" keyProperty="id">
         insert into `user-organ-link` (`user-id`, `organization-id`, `permission`)
         values (#{userId},
                 #{organizationId},

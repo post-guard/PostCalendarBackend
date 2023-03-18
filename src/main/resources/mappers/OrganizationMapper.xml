@@ -13,7 +13,7 @@
         select * from `organization` where name=#{name}
     </select>
 
-    <insert id="createOrganization" parameterType="Organization" >
+    <insert id="createOrganization" parameterType="Organization" useGeneratedKeys="true" keyProperty="id">
         insert into `organization` (name,
                                     details)
         values (#{name},

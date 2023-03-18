@@ -19,5 +19,8 @@ user:
     secret: ascnkuxvmnwerkjvfxckvnkujsefnvxcvsdfjkxcvjnksdjnxcvjnsd
     lifetime: 7
     issuer: PostCalendarBackend
+organization:
+  usersName: users
+  usersDetails: Organization for all users
 
 
