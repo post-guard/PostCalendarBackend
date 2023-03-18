@@ -1,6 +1,7 @@
 package top.rrricardo.postcalendarbackend.mappers;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import top.rrricardo.postcalendarbackend.models.Organization;
 import top.rrricardo.postcalendarbackend.models.OrganizationLink;
 import top.rrricardo.postcalendarbackend.models.User;
@@ -42,7 +43,8 @@ public interface OrganizationLinkMapper {
      * @param organizationId 组织ID
      * @return 指定的用户组织关系
      */
-    OrganizationLink getOrganizationLinkByUserIdAndOrganizationId(int userId, int organizationId);
+    OrganizationLink getOrganizationLinkByUserIdAndOrganizationId(
+            @Param("userId") int userId, @Param("organizationId") int organizationId);
 
     /**
      * 创建组织用户关系

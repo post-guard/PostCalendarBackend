@@ -23,7 +23,7 @@
     </select>
 
     <select id="getOrganizationLinkByUserIdAndOrganizationId" resultType="OrganizationLink">
-        select * from `user-organ-link` where `user-id`=#{arg0} and `organization-id`=#{arg1}
+        select * from `user-organ-link` where `user-id`=#{userId} and `organization-id`=#{organizationId}
     </select>
 
     <insert id="createOrganizationLink" parameterType="OrganizationLink" useGeneratedKeys="true" keyProperty="id">

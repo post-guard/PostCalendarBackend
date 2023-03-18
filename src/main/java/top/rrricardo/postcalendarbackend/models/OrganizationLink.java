@@ -14,6 +14,13 @@ public class OrganizationLink {
         this.permission = permission.ordinal();
     }
 
+    public OrganizationLink(int id, int userId, int organizationId, int permission) {
+        this.id = id;
+        this.userId = userId;
+        this.organizationId = organizationId;
+        this.permission = permission;
+    }
+
     public int getUserId() {
         return userId;
     }
