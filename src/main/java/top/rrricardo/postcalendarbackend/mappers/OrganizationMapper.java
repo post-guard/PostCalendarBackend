@@ -21,6 +21,13 @@ public interface OrganizationMapper {
     Organization getOrganizationById(int id);
 
     /**
+     * 利用名称查询组织
+     * @param name 组织名称
+     * @return 组织
+     */
+    Organization getOrganizationByName(String name);
+
+    /**
      * 创建组织
      * @param organization 需要创建的组织
      */
