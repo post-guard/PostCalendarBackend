@@ -1,9 +1,11 @@
 package top.rrricardo.postcalendarbackend.mappers;
 
+import org.apache.ibatis.annotations.Mapper;
 import top.rrricardo.postcalendarbackend.models.Organization;
 
 import java.util.List;
 
+@Mapper
 public interface OrganizationMapper {
     /**
      * 获得所有的组织列表

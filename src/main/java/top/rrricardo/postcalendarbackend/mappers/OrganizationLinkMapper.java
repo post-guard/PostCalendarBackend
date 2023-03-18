@@ -1,11 +1,13 @@
 package top.rrricardo.postcalendarbackend.mappers;
 
+import org.apache.ibatis.annotations.Mapper;
 import top.rrricardo.postcalendarbackend.models.Organization;
 import top.rrricardo.postcalendarbackend.models.OrganizationLink;
 import top.rrricardo.postcalendarbackend.models.User;
 
 import java.util.List;
 
+@Mapper
 public interface OrganizationLinkMapper {
     /**
      * 获得所有的组织用户关系
@@ -33,6 +35,14 @@ public interface OrganizationLinkMapper {
      * @return 指定的用户组织
      */
     OrganizationLink getOrganizationLinkById(int id);
+
+    /**
+     * 指定用户ID和组织ID获得组织用户关系
+     * @param userId 用户ID
+     * @param organizationId 组织ID
+     * @return 指定的用户组织关系
+     */
+    OrganizationLink getOrganizationLinkByUserIdAndOrganizationId(int userId, int organizationId);
 
     /**
      * 创建组织用户关系
