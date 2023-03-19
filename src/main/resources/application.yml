@@ -5,6 +5,8 @@ spring:
     url: jdbc:mysql://101.200.78.91:3306/post_calendar?serverTimezone=GMT%2B8&useSSL=true
     username: postAdmin
     password: 30933847683279925
+    hikari:
+      max-lifetime: 180000
   thymeleaf:
     cache: false
 mybatis:
