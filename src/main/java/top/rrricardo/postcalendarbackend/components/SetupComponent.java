@@ -6,11 +6,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import top.rrricardo.postcalendarbackend.enums.UserPermission;
-import top.rrricardo.postcalendarbackend.mappers.OrganizationLinkMapper;
-import top.rrricardo.postcalendarbackend.mappers.OrganizationMapper;
+import top.rrricardo.postcalendarbackend.mappers.GroupLinkMapper;
+import top.rrricardo.postcalendarbackend.mappers.GroupMapper;
 import top.rrricardo.postcalendarbackend.mappers.UserMapper;
-import top.rrricardo.postcalendarbackend.models.Organization;
-import top.rrricardo.postcalendarbackend.models.OrganizationLink;
+import top.rrricardo.postcalendarbackend.models.Group;
+import top.rrricardo.postcalendarbackend.models.GroupLink;
 import top.rrricardo.postcalendarbackend.models.User;
 import top.rrricardo.postcalendarbackend.services.UserService;
 import top.rrricardo.postcalendarbackend.utils.Common;
@@ -20,8 +20,8 @@ public class SetupComponent implements CommandLineRunner {
 
     private final UserMapper userMapper;
     private final UserService userService;
-    private final OrganizationMapper organizationMapper;
-    private final OrganizationLinkMapper organizationLinkMapper;
+    private final GroupMapper groupMapper;
+    private final GroupLinkMapper groupLinkMapper;
     private final Logger logger;
 
     @Value("${user.rootUserEmailAddress}")
@@ -33,44 +33,44 @@ public class SetupComponent implements CommandLineRunner {
     @Value("${user.rootPassword}")
     private String rootPassword;
 
-    @Value("${organization.usersName}")
-    private String usersOrganizationName;
+    @Value("${group.usersName}")
+    private String usersGroupName;
 
-    @Value("${organization.usersDetails}")
-    private String usersOrganizationDetails;
+    @Value("${group.usersDetails}")
+    private String usersGroupDetails;
 
     public SetupComponent(UserMapper userMapper,
                           UserService userService,
-                          OrganizationMapper organizationMapper,
-                          OrganizationLinkMapper organizationLinkMapper) {
+                          GroupMapper groupMapper,
+                          GroupLinkMapper groupLinkMapper) {
         this.userMapper = userMapper;
         this.userService = userService;
-        this.organizationMapper = organizationMapper;
-        this.organizationLinkMapper = organizationLinkMapper;
+        this.groupMapper = groupMapper;
+        this.groupLinkMapper = groupLinkMapper;
         logger = LoggerFactory.getLogger(SetupComponent.class);
     }
 
     @Override
     public void run(String... args) {
         // 创建默认用户组
-        var usersOrganization = organizationMapper.getOrganizationByName(usersOrganizationName);
+        var usersGroup = groupMapper.getGroupByName(usersGroupName);
 
-        if (usersOrganization == null) {
-            usersOrganization = new Organization(
-                    usersOrganizationName,
-                    usersOrganizationDetails
+        if (usersGroup == null) {
+            usersGroup = new Group(
+                    usersGroupName,
+                    usersGroupDetails
             );
 
-            organizationMapper.createOrganization(usersOrganization);
+            groupMapper.createGroup(usersGroup);
 
-            logger.info("Create default users organization.");
+            logger.info("Create default users group.");
         } else {
-            logger.info("Default users organization exists");
+            logger.info("Default users group exists");
         }
 
         // 设置用户组ID
-        Common.DefaultUsersOrganizationId = usersOrganization.getId();
-        logger.info("Default users organization id is: " + Common.DefaultUsersOrganizationId);
+        Common.DefaultUsersGroupId = usersGroup.getId();
+        logger.info("Default users group id is: " + Common.DefaultUsersGroupId);
 
         // 创建默认管理员账户
         var result = userMapper.getUserByEmail(rootUserEmailAddress);
@@ -86,10 +86,10 @@ public class SetupComponent implements CommandLineRunner {
             logger.info("Root doesn't exist, created.");
 
             // 将默认管理员加入默认用户组
-            var link = new OrganizationLink(root.getId(), Common.DefaultUsersOrganizationId, UserPermission.SUPER);
+            var link = new GroupLink(root.getId(), Common.DefaultUsersGroupId, UserPermission.SUPER);
 
-            organizationLinkMapper.createOrganizationLink(link);
-            logger.info("Add root to default users organization.");
+            groupLinkMapper.createGroupLink(link);
+            logger.info("Add root to default users group.");
         } else {
             logger.info("Root exists.");
         }

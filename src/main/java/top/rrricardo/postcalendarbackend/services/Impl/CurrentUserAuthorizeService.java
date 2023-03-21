@@ -6,24 +6,24 @@ import org.springframework.stereotype.Service;
 import top.rrricardo.postcalendarbackend.dtos.UserDTO;
 import top.rrricardo.postcalendarbackend.enums.UserPermission;
 import top.rrricardo.postcalendarbackend.exceptions.NoUserIdException;
-import top.rrricardo.postcalendarbackend.mappers.OrganizationLinkMapper;
+import top.rrricardo.postcalendarbackend.mappers.GroupLinkMapper;
 import top.rrricardo.postcalendarbackend.services.AuthorizeService;
 import top.rrricardo.postcalendarbackend.utils.Common;
 
 @Service("currentUser")
 public class CurrentUserAuthorizeService implements AuthorizeService {
-    private final OrganizationLinkMapper organizationLinkMapper;
+    private final GroupLinkMapper groupLinkMapper;
     private final Logger logger;
 
-    public CurrentUserAuthorizeService(OrganizationLinkMapper organizationLinkMapper) {
-        this.organizationLinkMapper = organizationLinkMapper;
+    public CurrentUserAuthorizeService(GroupLinkMapper groupLinkMapper) {
+        this.groupLinkMapper = groupLinkMapper;
         this.logger = LoggerFactory.getLogger(CurrentUserAuthorizeService.class);
     }
 
     @Override
     public boolean authorize(UserDTO user, String requestUri) throws NoUserIdException {
-        var link = organizationLinkMapper.getOrganizationLinkByUserIdAndOrganizationId(user.getId(),
-                Common.DefaultUsersOrganizationId);
+        var link = groupLinkMapper.getGroupLinkByUserIdAndGroupId(user.getId(),
+                Common.DefaultUsersGroupId);
 
         if (link.getPermissionEnum().getCode() >= UserPermission.ADMIN.getCode()) {
             // 如果请求者是管理员

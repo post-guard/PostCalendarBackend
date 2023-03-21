@@ -2,22 +2,22 @@ package top.rrricardo.postcalendarbackend.models;
 
 import top.rrricardo.postcalendarbackend.enums.UserPermission;
 
-public class OrganizationLink {
+public class GroupLink {
     private int id;
     private int userId;
-    private int organizationId;
+    private int groupId;
     private int permission;
 
-    public OrganizationLink(int userId, int organizationId, UserPermission permission) {
+    public GroupLink(int userId, int groupId, UserPermission permission) {
         this.userId = userId;
-        this.organizationId = organizationId;
+        this.groupId = groupId;
         this.permission = permission.ordinal();
     }
 
-    public OrganizationLink(int id, int userId, int organizationId, int permission) {
+    public GroupLink(int id, int userId, int groupId, int permission) {
         this.id = id;
         this.userId = userId;
-        this.organizationId = organizationId;
+        this.groupId = groupId;
         this.permission = permission;
     }
 
@@ -29,12 +29,12 @@ public class OrganizationLink {
         this.userId = userId;
     }
 
-    public int getOrganizationId() {
-        return organizationId;
+    public int getGroupId() {
+        return groupId;
     }
 
-    public void setOrganizationId(int organizationId) {
-        this.organizationId = organizationId;
+    public void setGroupId(int groupId) {
+        this.groupId = groupId;
     }
 
     public int getPermission() {

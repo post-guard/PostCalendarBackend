@@ -17,6 +17,8 @@ public class AuthorizeInterceptor implements HandlerInterceptor {
     private final JwtService jwtService;
     private final AuthorizeServiceFactory authorizeServiceFactory;
 
+    private static final ThreadLocal<UserDTO> local = new ThreadLocal<>();
+
     public AuthorizeInterceptor(JwtService jwtService, AuthorizeServiceFactory authorizeServiceFactory) {
         this.jwtService = jwtService;
         this.authorizeServiceFactory = authorizeServiceFactory;
@@ -55,7 +57,8 @@ public class AuthorizeInterceptor implements HandlerInterceptor {
             );
             var authService = authorizeServiceFactory.getAuthorizeService(authorize.policy());
 
-            if (authService.authorize(userDTO, request.getRequestURI())){
+            if (authService.authorize(userDTO, request.getRequestURI())) {
+                local.set(userDTO);
                 return true;
             } else {
                 var responseDTO = new ResponseDTO<UserDTO>("No permission");
@@ -81,5 +84,14 @@ public class AuthorizeInterceptor implements HandlerInterceptor {
 
             return false;
         }
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        local.remove();
+    }
+
+    public static UserDTO getUserDTO() {
+        return local.get();
     }
 }

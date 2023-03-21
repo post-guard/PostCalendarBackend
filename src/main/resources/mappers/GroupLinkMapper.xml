@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.rrricardo.postcalendarbackend.mappers.GroupLinkMapper">
+
+    <select id="getGroupLinks" resultType="GroupLink">
+        select * from `user-group-links`
+    </select>
+
+    <select id="getGroupLinkById" parameterType="int" resultType="GroupLink">
+        select * from `user-group-links` where id=#{id}
+    </select>
+
+    <select id="getGroupLinksByUserId" parameterType="int" resultType="Group">
+        select a.id, a.name, a.details
+        from `groups` a
+                 join `user-group-links` b on a.id = b.`group-id` and b.`user-id` = #{userId}
+    </select>
+
+    <select id="getGroupLinksByGroupId" parameterType="int" resultType="User">
+        select a.id, a.username, a.emailAddress, a.password
+        from `users` a
+                 join `user-group-links` b on a.id = b.`user-id` and b.`group-id` = #{groupId}
+    </select>
+
+    <select id="getGroupLinkByUserIdAndGroupId" resultType="GroupLink">
+        select * from `user-group-links` where `user-id`=#{userId} and `group-id`=#{groupId}
+    </select>
+
+    <insert id="createGroupLink" parameterType="GroupLink" useGeneratedKeys="true" keyProperty="id">
+        insert into `user-group-links` (`user-id`, `group-id`, `permission`)
+        values (#{userId},
+                #{groupId},
+                #{permission})
+    </insert>
+
+    <update id="updateGroupLink" parameterType="GroupLink">
+        update `user-group-links`
+        set `user-id`=#{userId},
+            `group-id`=#{groupId},
+            `permission`=#{permission}
+        where id = #{id}
+    </update>
+
+    <delete id="deleteGroupLink" parameterType="int">
+        delete from `user-group-links` where id=#{id}
+    </delete>
+</mapper>

@@ -8,17 +8,17 @@ create table if not exists `users` (
     primary key (`id`)
 );
 
-create table if not exists `organization` (
+create table if not exists `groups` (
     `id` int not null auto_increment,
     `name` varchar(20) not null ,
     `details` text,
     primary key (`id`)
 );
 
-create table if not exists `user-organ-link` (
+create table if not exists `user-group-links` (
     `id` int not null auto_increment,
     `user-id` int not null ,
-    `organization-id` int not null ,
+    `group-id` int not null ,
     `permission` int not null,
     primary key (`id`)
 );

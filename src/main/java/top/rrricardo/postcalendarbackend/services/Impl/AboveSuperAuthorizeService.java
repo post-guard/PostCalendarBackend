@@ -3,7 +3,7 @@ package top.rrricardo.postcalendarbackend.services.Impl;
 import org.springframework.stereotype.Service;
 import top.rrricardo.postcalendarbackend.dtos.UserDTO;
 import top.rrricardo.postcalendarbackend.enums.UserPermission;
-import top.rrricardo.postcalendarbackend.mappers.OrganizationLinkMapper;
+import top.rrricardo.postcalendarbackend.mappers.GroupLinkMapper;
 import top.rrricardo.postcalendarbackend.services.AuthorizeService;
 import top.rrricardo.postcalendarbackend.utils.Common;
 
@@ -12,16 +12,16 @@ import top.rrricardo.postcalendarbackend.utils.Common;
  */
 @Service("aboveSuperman")
 public class AboveSuperAuthorizeService implements AuthorizeService {
-    private final OrganizationLinkMapper organizationLinkMapper;
+    private final GroupLinkMapper groupLinkMapper;
 
-    public AboveSuperAuthorizeService(OrganizationLinkMapper organizationLinkMapper) {
-        this.organizationLinkMapper = organizationLinkMapper;
+    public AboveSuperAuthorizeService(GroupLinkMapper groupLinkMapper) {
+        this.groupLinkMapper = groupLinkMapper;
     }
 
     @Override
     public boolean authorize(UserDTO user, String requestUri) {
-        var link = organizationLinkMapper.getOrganizationLinkByUserIdAndOrganizationId(user.getId(),
-                Common.DefaultUsersOrganizationId);
+        var link = groupLinkMapper.getGroupLinkByUserIdAndGroupId(user.getId(),
+                Common.DefaultUsersGroupId);
 
         return link.getPermissionEnum().getCode() >= UserPermission.SUPER.getCode();
     }

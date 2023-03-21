@@ -3,12 +3,12 @@ package top.rrricardo.postcalendarbackend.models;
 /**
  * 组织
  */
-public class Organization {
+public class Group {
     private int id;
     private String name;
     private String details;
 
-    public Organization(String name, String details) {
+    public Group(String name, String details) {
         this.name = name;
         this.details = details;
     }

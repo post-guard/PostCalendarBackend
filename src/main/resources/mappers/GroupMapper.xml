@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.rrricardo.postcalendarbackend.mappers.GroupMapper">
+    <select id="getGroups" resultType="Group" >
+        select * from `groups`
+    </select>
+
+    <select id="getGroupById" parameterType="int" resultType="Group" >
+        select * from `groups` where id = #{id}
+    </select>
+
+    <select id="getGroupByName" parameterType="String" resultType="Group" >
+        select * from `groups` where name=#{name}
+    </select>
+
+    <insert id="createGroup" parameterType="Group" useGeneratedKeys="true" keyProperty="id">
+        insert into `groups` (name,
+                                    details)
+        values (#{name},
+                #{details})
+    </insert>
+
+    <update id="updateGroup" parameterType="Group">
+        update `groups` set name=#{name}, details=#{details}
+        where id=#{id}
+    </update>
+
+    <delete id="deleteGroup" parameterType="int">
+        delete from `groups` where id=#{id}
+    </delete>
+</mapper>
