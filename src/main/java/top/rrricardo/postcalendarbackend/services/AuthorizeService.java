@@ -1,8 +1,7 @@
 package top.rrricardo.postcalendarbackend.services;
 
 import top.rrricardo.postcalendarbackend.dtos.UserDTO;
-import top.rrricardo.postcalendarbackend.exceptions.NoUserIdException;
-import top.rrricardo.postcalendarbackend.models.User;
+import top.rrricardo.postcalendarbackend.exceptions.NoIdInPathException;
 
 public interface AuthorizeService {
     /**
@@ -11,5 +10,5 @@ public interface AuthorizeService {
      * @param requestUri 请求的URI
      * @return 是否通过拥有权限
      */
-    boolean authorize(UserDTO user, String requestUri) throws NoUserIdException;
+    boolean authorize(UserDTO user, String requestUri) throws NoIdInPathException;
 }

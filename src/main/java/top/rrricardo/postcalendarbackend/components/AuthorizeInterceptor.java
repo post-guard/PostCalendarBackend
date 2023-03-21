@@ -9,7 +9,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import top.rrricardo.postcalendarbackend.annotations.Authorize;
 import top.rrricardo.postcalendarbackend.dtos.ResponseDTO;
 import top.rrricardo.postcalendarbackend.dtos.UserDTO;
-import top.rrricardo.postcalendarbackend.exceptions.NoUserIdException;
+import top.rrricardo.postcalendarbackend.exceptions.NoIdInPathException;
 import top.rrricardo.postcalendarbackend.services.JwtService;
 
 @Component
@@ -75,7 +75,7 @@ public class AuthorizeInterceptor implements HandlerInterceptor {
             response.getWriter().println(responseDTO);
 
             return false;
-        } catch (NoUserIdException e) {
+        } catch (NoIdInPathException e) {
             // 在请求路径中没有获取到用户ID
             var responseDTO = new ResponseDTO<UserDTO>("Internal server error, please contact administrator");
 
@@ -87,7 +87,7 @@ public class AuthorizeInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
         local.remove();
     }
 

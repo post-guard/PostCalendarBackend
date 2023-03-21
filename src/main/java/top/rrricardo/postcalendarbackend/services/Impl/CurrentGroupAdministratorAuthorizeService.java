@@ -8,33 +8,30 @@ import top.rrricardo.postcalendarbackend.enums.UserPermission;
 import top.rrricardo.postcalendarbackend.exceptions.NoIdInPathException;
 import top.rrricardo.postcalendarbackend.mappers.GroupLinkMapper;
 import top.rrricardo.postcalendarbackend.services.AuthorizeService;
-import top.rrricardo.postcalendarbackend.utils.Common;
 
-@Service("currentUser")
-public class CurrentUserAuthorizeService implements AuthorizeService {
+@Service("currentGroupAdministrator")
+public class CurrentGroupAdministratorAuthorizeService implements AuthorizeService {
     private final GroupLinkMapper groupLinkMapper;
     private final Logger logger;
 
-    public CurrentUserAuthorizeService(GroupLinkMapper groupLinkMapper) {
+    public CurrentGroupAdministratorAuthorizeService(GroupLinkMapper groupLinkMapper) {
         this.groupLinkMapper = groupLinkMapper;
-        this.logger = LoggerFactory.getLogger(CurrentUserAuthorizeService.class);
+        this.logger = LoggerFactory.getLogger(CurrentGroupAdministratorAuthorizeService.class);
     }
 
     @Override
     public boolean authorize(UserDTO user, String requestUri) throws NoIdInPathException {
-        var link = groupLinkMapper.getGroupLinkByUserIdAndGroupId(user.getId(),
-                Common.DefaultUsersGroupId);
-
-        if (link.getPermissionEnum().getCode() >= UserPermission.ADMIN.getCode()) {
-            // 如果请求者是管理员
-            return true;
-        }
-
-        var array = requestUri.split("/");
         try {
+            var array = requestUri.split("/");
             var id = Integer.parseInt(array[array.length - 1]);
 
-            return id == user.getId();
+            var link = groupLinkMapper.getGroupLinkByUserIdAndGroupId(user.getId(), id);
+
+            if (link == null) {
+                return false;
+            } else {
+                return link.getPermissionEnum().getCode() >= UserPermission.ADMIN.getCode();
+            }
         } catch (NumberFormatException e) {
             logger.error("Failed to get id in uri: " + requestUri);
 
