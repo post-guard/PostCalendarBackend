@@ -52,4 +52,8 @@ public class GroupLink {
     public void setPermissionEnum(UserPermission permission) {
         this.permission = permission.ordinal();
     }
+
+    public int getId() {
+        return id;
+    }
 }
