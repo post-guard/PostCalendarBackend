@@ -23,6 +23,24 @@ create table if not exists `user-group-links` (
     primary key (`id`)
 );
 
+create table if not exists `places` (
+    `id` int not null auto_increment,
+    `name` text not null ,
+    `x` int not null ,
+    `y` int not null ,
+    `placeType` int not null ,
+    primary key (`id`)
+);
+
+create table if not exists `roads` (
+    `id` int not null auto_increment,
+    `name` text not null ,
+    `startPlaceId` int not null ,
+    `endPlaceId` int not null ,
+    `length` int not null ,
+    primary key (`id`)
+);
+
 
 
 
