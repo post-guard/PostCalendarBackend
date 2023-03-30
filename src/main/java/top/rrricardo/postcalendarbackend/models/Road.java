@@ -4,15 +4,15 @@ public class Road {
 
     private int id;
     private String name;
-    private Place startPlace;
-    private Place endPlace;
+    private int startPlaceId;
+    private int endPlaceId;
     private int length;
 
-    public Road(int id, String name, Place startPlace, Place endPlace, int length){
+    public Road(int id, String name, int startPlaceId, int endPlaceId, int length){
         this.id = id;
         this.name = name;
-        this.startPlace = startPlace;
-        this.endPlace = endPlace;
+        this.startPlaceId = startPlaceId;
+        this.endPlaceId = endPlaceId;
         this.length = length;
     }
 
@@ -22,27 +22,27 @@ public class Road {
 
     public void setName(String name) { this.name = name; }
 
-    public Place getStartPlace() {
-        return startPlace;
-    }
-
-    public void setStartPlace(Place startPlace) {
-        this.startPlace = startPlace;
-    }
-
-    public Place getEndPlace() {
-        return endPlace;
-    }
-
-    public void setEndPlace(Place endPlace) {
-        this.endPlace = endPlace;
-    }
-
     public int getLength() {
         return length;
     }
 
     public void setLength(int length) {
         this.length = length;
+    }
+
+    public int getStartPlaceId() {
+        return startPlaceId;
+    }
+
+    public void setStartPlaceId(int startPlaceId) {
+        this.startPlaceId = startPlaceId;
+    }
+
+    public int getEndPlaceId() {
+        return endPlaceId;
+    }
+
+    public void setEndPlaceId(int endPlaceId) {
+        this.endPlaceId = endPlaceId;
     }
 }
