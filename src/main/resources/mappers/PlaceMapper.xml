@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.rrricardo.postcalendarbackend.mappers.PlaceMapper">
+    <select id="getPlaces" resultType="Place">
+        select * from `places`;
+    </select>
+
+    <select id="getPlaceById" parameterType="int" resultType="Place">
+        select * from `places` where `id` = #{id};
+    </select>
+
+    <select id="getPlaceByName" parameterType="String" resultType="Place">
+        select * from `places` where `name` like #{name};
+    </select>
+
+    <insert id="createPlace" parameterType="Place" useGeneratedKeys="true" keyProperty="id">
+        insert into `places` (name, x, y, placeType)
+        values (#{name},
+                #{x},
+                #{y},
+                #{placeType});
+    </insert>
+
+    <update id="updatePlace" parameterType="Place">
+        update `places` set name=#{name}, x=#{x}, y=#{y}, placeType=#{placeType}
+        where `id`=#{id};
+    </update>
+
+    <delete id="deletePlace" parameterType="int">
+        delete from `places` where id=#{id};
+    </delete>
+    
+</mapper>

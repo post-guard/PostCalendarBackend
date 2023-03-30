@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper>
+    <select id="getRoads" resultType="Road">
+        select * from `roads`;
+    </select>
+
+    <select id="getRoadById" parameterType="int" resultType="Road">
+        select * from `roads` where id=#{id};
+    </select>
+
+    <insert id="createRoad" parameterType="Road" useGeneratedKeys="true" keyProperty="id">
+        insert into `roads` (name, startPlaceId, endPlaceId, length)
+        VALUES (#{name}, #{startPlaceId}, #{endPlaceId}, #{length});
+    </insert>
+
+    <update id="updateRoad" parameterType="Road">
+        update `roads` set name=#{name}, startPlaceId=#{startPlaceId}, endPlaceId=#{endPlaceId}, length=#{length}
+        where id=#{id};
+    </update>
+
+    <delete id="deleteRoad" parameterType="int">
+        delete from `roads` where id=#{id};
+    </delete>
+</mapper>

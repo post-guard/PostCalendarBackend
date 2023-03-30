@@ -12,10 +12,9 @@ public interface RoadMapper {
 
     Road getRoadById(int id);
 
-    Road getRoadByName(String name);
-
     void createRoad(Road road);
 
     void updateRoad(Road road);
+
     void deleteRoad(int id);
 }

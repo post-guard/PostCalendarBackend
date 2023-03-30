@@ -15,7 +15,7 @@ public interface PlaceMapper {
     Place getPlaceById(int id);
 
     //通过名字获取地点
-    Place getPlaceByName(String name);
+    List<Place> getPlaceByName(String name);
 
     //添加地点
     void createPlace(Place place);
