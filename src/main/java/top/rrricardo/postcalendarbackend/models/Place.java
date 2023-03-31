@@ -18,6 +18,17 @@ public class Place {
         this.placeType = placeType.ordinal();
     }
 
+    public Place(int id, String name, int x, int y, int placeType) {
+        this.id = id;
+        this.name = name;
+        this.x = x;
+        this.y = y;
+        this.placeType = placeType;
+    }
+
+    public Place(){
+
+    }
     public int getId() { return id; }
 
     public String getName() { return name; }
