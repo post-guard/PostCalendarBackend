@@ -71,7 +71,7 @@ public class GroupLinkController extends ControllerBase {
                 } else {
                     link.setPermissionEnum(groupLink.getPermissionEnum());
                     groupLinkMapper.updateGroupLink(link);
-                    return ok("用户权限修改成功", link);
+                    return created("用户权限修改成功", link);
                 }
             } else {
                 return badRequest("用户已经存在");
@@ -79,7 +79,7 @@ public class GroupLinkController extends ControllerBase {
         } else {
             groupLinkMapper.createGroupLink(groupLink);
 
-            return ok("创建用户成功", groupLink);
+            return created("创建用户成功", groupLink);
         }
     }
 

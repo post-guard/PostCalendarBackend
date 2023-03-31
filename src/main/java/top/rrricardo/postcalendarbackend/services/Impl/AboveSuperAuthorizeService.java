@@ -23,6 +23,10 @@ public class AboveSuperAuthorizeService implements AuthorizeService {
         var link = groupLinkMapper.getGroupLinkByUserIdAndGroupId(user.getId(),
                 Common.DefaultUsersGroupId);
 
+        if (link == null) {
+            return false;
+        }
+
         return link.getPermissionEnum().getCode() >= UserPermission.SUPER.getCode();
     }
 }
