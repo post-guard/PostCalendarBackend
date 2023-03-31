@@ -35,7 +35,7 @@ public class AuthController extends ControllerBase {
         var result = userService.userLogin(userLogin.getEmailAddress(), userLogin.getPassword());
 
         if (result == null) {
-            return notFound("用户不存在");
+            return notFound("电子邮件或密码错误");
         } else {
             var map = new HashMap<String, Object>();
             map.put("id", result.getId());

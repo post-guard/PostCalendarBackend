@@ -2,21 +2,27 @@ package top.rrricardo.postcalendarbackend.services.Impl;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import top.rrricardo.postcalendarbackend.enums.UserPermission;
+import top.rrricardo.postcalendarbackend.mappers.GroupLinkMapper;
 import top.rrricardo.postcalendarbackend.mappers.UserMapper;
+import top.rrricardo.postcalendarbackend.models.GroupLink;
 import top.rrricardo.postcalendarbackend.models.User;
 import top.rrricardo.postcalendarbackend.services.UserService;
+import top.rrricardo.postcalendarbackend.utils.Common;
 import top.rrricardo.postcalendarbackend.utils.EncryptSha256Util;
 
 
 @Service
 public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
+    private final GroupLinkMapper groupLinkMapper;
 
     @Value("${user.password-salt}")
     private String passwordSalt;
 
-    public UserServiceImpl(UserMapper userMapper) {
+    public UserServiceImpl(UserMapper userMapper, GroupLinkMapper groupLinkMapper) {
         this.userMapper = userMapper;
+        this.groupLinkMapper = groupLinkMapper;
     }
 
     @Override
@@ -47,6 +53,14 @@ public class UserServiceImpl implements UserService {
         user.setPassword(sha256Password(user.getPassword()));
 
         userMapper.createUser(user);
+
+        // 将用户加入默认用户组
+        var link = new GroupLink(
+                user.getId(),
+                Common.DefaultUsersGroupId,
+                UserPermission.SUPER
+        );
+        groupLinkMapper.createGroupLink(link);
 
         return true;
     }
