@@ -30,7 +30,7 @@ public class ShortestPathServiceImpl implements ShortestPathService {
 
         var places = placeMapper.getPlaces();
         HashMap<Integer, Integer> idToIndex = new HashMap<>(); //将数据库中地点的id映射到0 ~ N-1上
-        int i = 0;
+        int i;
         for(i = 0; i < places.size(); i++){
             idToIndex.put(places.get(i).getId(), i);
         }
@@ -98,7 +98,7 @@ public class ShortestPathServiceImpl implements ShortestPathService {
         String str = String.valueOf(path[destination]);
         String [] array = str.split("-");
         for(i = 0; i < array.length; i++){
-            list.add(placeMapper.getPlaceById(places.get(Integer.parseInt(array[i])).getId()));
+            list.add(places.get(Integer.parseInt(array[i])));
         }
 
         return list;
