@@ -12,7 +12,7 @@ public class AvlTree<T extends Comparable<? super T>> {
     private static final int AllowedImbalance = 1;
 
     public void insert(T data) throws AvlNodeRepeatException {
-        var newNode = new AvlTreeNode<T>(data);
+        var newNode = new AvlTreeNode<>(data);
 
         if (root == null) {
             // 空树
