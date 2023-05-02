@@ -41,6 +41,18 @@ create table if not exists `roads` (
     primary key (`id`)
 );
 
+create table if not exists `time-span-events` (
+    `id` int not null auto_increment,
+    `name` text not null ,
+    `details` text not null ,
+    `userId` int ,
+    `groupId` int ,
+    `placeId` int not null ,
+    `beginDateTime` DATETIME not null ,
+    `endDateTime` DATETIME not null ,
+    primary key (`id`)
+);
+
 
 
 
