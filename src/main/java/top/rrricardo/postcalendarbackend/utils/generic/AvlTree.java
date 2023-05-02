@@ -11,6 +11,11 @@ public class AvlTree<T extends Comparable<? super T>> {
     // 最大允许的不平衡参数
     private static final int AllowedImbalance = 1;
 
+    /**
+     * 想平衡树中插入一个节点
+     * @param data 需要插入节点的数据
+     * @throws AvlNodeRepeatException 同平衡树中的数据冲突
+     */
     public void insert(T data) throws AvlNodeRepeatException {
         var newNode = new AvlTreeNode<>(data);
 
@@ -20,6 +25,14 @@ public class AvlTree<T extends Comparable<? super T>> {
         } else {
             insert(root, newNode);
         }
+    }
+
+    /**
+     * 从节点中移除一个数据
+     * @param data 需要移除的数据
+     */
+    public void remove(T data) {
+        remove(root, data);
     }
 
     @Override
@@ -87,6 +100,67 @@ public class AvlTree<T extends Comparable<? super T>> {
         }
 
         balanceTree(parent);
+    }
+
+    /**
+     * 从树中移除一个节点
+     * @param node 需要移除节点所在子树的根节点
+     * @param removeData 需要移除的数据
+     */
+    private void remove(AvlTreeNode<T> node, T removeData) {
+        if (node == null) {
+            return;
+        }
+
+        var result = removeData.compareTo(node.data);
+
+        if (result > 0) {
+            remove(node.rightNode, removeData);
+        } else if (result < 0) {
+            remove(node.leftNode, removeData);
+        }
+
+        if (removeData.equals(node.data)) {
+            // 当前节点和需要删除的数据大小一致
+            // 确认两个数据一致
+            if (node.leftNode != null && node.rightNode != null) {
+                // 需要移除节点的左右子树都存在
+                node.data = findMinNode(node.rightNode).data;
+                // 移除被移动到parent的原始节点
+                remove(node.rightNode, node.data);
+            } else {
+                var parent = node.parentNode;
+
+                if (parent != null) {
+                    // 当前节点不是根节点
+                    if (node == parent.leftNode) {
+                        parent.leftNode = node.leftNode != null ? node.leftNode : node.rightNode;
+
+                        if (parent.leftNode != null) {
+                            parent.leftNode.parentNode = parent;
+                        }
+                    } else if (node == parent.rightNode) {
+                        parent.rightNode = node.leftNode != null ? node.leftNode : node.rightNode;
+
+                        if (parent.rightNode != null) {
+                            parent.rightNode.parentNode = parent;
+                        }
+                    }
+
+                    node = parent;
+                } else {
+                    // 当前节点是根节点
+                    root = node.leftNode != null ? node.leftNode : node.rightNode;
+                    if (root != null) {
+                        root.parentNode = null;
+                    }
+
+                    node = root;
+                }
+            }
+        }
+
+        balanceTree(node);
     }
 
     /**
@@ -239,21 +313,6 @@ public class AvlTree<T extends Comparable<? super T>> {
         }
 
         return findMinNode(node.leftNode);
-    }
-
-    /**
-     * 寻找当前子树的最大节点
-     * @param node 需要寻找的子树根节点
-     * @return 最大节点
-     */
-    private AvlTreeNode<T> findMaxNode(AvlTreeNode<T> node) {
-        if (node == null) {
-            return null;
-        } else if (node.rightNode == null) {
-            return node;
-        }
-
-        return findMaxNode(node.rightNode);
     }
 
     /**
