@@ -24,6 +24,16 @@ public class AvlTreeNode<T extends Comparable<? super T>> {
         return data;
     }
 
+    /**
+     * 获得当前姐弟年的平衡因子
+     * @return 当前
+     */
+    public int getBalanceFactor() {
+        var leftHeight = leftNode != null ? leftNode.height : 0;
+        var rightHeight = rightNode != null ? rightNode.height : 0;
+
+        return leftHeight - rightHeight;
+    }
     @Override
     public String toString() {
         return data.toString();

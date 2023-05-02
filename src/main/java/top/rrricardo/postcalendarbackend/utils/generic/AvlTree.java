@@ -19,16 +19,6 @@ public class AvlTree<T extends Comparable<? super T>> {
             root = newNode;
         } else {
             insert(root, newNode);
-
-            // 插入之后重新计算每个节点的高度
-            reCalculateHeight(root);
-
-            var imBalanceTree = findMinImbalanceNode(newNode);
-
-            if (imBalanceTree != null) {
-                // 发现了不平衡的地方
-                rotate(newNode, imBalanceTree);
-            }
         }
     }
 
@@ -78,6 +68,8 @@ public class AvlTree<T extends Comparable<? super T>> {
             if (parent.leftNode == null) {
                 parent.leftNode = node;
                 node.parentNode = parent;
+
+                reCalculateHeight(root);
             } else {
                 // 递归调用
                 insert(parent.leftNode, node);
@@ -87,37 +79,14 @@ public class AvlTree<T extends Comparable<? super T>> {
             if (parent.rightNode == null) {
                 parent.rightNode = node;
                 node.parentNode = parent;
+
+                reCalculateHeight(root);
             } else {
                 insert(parent.rightNode, node);
             }
         }
-    }
 
-    /**
-     * 找到树中最小的不平衡子树
-     * @param node 新插入的节点
-     * @return 不平衡子树的根节点
-     */
-    private AvlTreeNode<T> findMinImbalanceNode(AvlTreeNode<T> node) {
-        var parent = node.parentNode;
-
-        if (parent != null) {
-            var balanceFactor = Math.abs(AvlTreeNode.CalculateBalanceFactor(parent));
-            if (balanceFactor > AllowedImbalance) {
-                return parent;
-            } else {
-                // 继续向上递归查找
-                return findMinImbalanceNode(parent);
-            }
-        } else {
-            var balanceFactor = Math.abs(AvlTreeNode.CalculateBalanceFactor(node));
-
-            if (balanceFactor > AllowedImbalance) {
-                return node;
-            }
-        }
-
-        return null;
+        balanceTree(parent);
     }
 
     /**
@@ -195,37 +164,41 @@ public class AvlTree<T extends Comparable<? super T>> {
     }
 
     /**
-     * 执行旋转
-     * @param newNode 新插入的节点
-     * @param tree 不平衡子树的根节点
+     * 将树调整平衡
+     * @param node 新插入/删除节点的父节点
      */
-    private void rotate(AvlTreeNode<T> newNode, AvlTreeNode<T> tree) {
+    private void balanceTree(AvlTreeNode<T> node) {
         /*
         插入之后可能出现的四种情况
         - 左左 右旋纠正
         - 左右 左旋更正为左左
         - 右右 左旋纠正
         - 右左 右旋更正为右右
+        删除中也具有类似的规律
          */
 
-        var parent = newNode.parentNode;
-        var balanceFactor = AvlTreeNode.CalculateBalanceFactor(tree);
-        if (balanceFactor > 0) {
-            // 左边的高于右边
-            if (newNode != parent.leftNode) {
-                // 左右的插入情况
-                leftRotate(parent);
+        if (node == null) {
+            return;
+        }
+
+        var balanceFactor = node.getBalanceFactor();
+
+        if (balanceFactor > AllowedImbalance) {
+            // 左边高于右边
+            if (height(node.leftNode.rightNode) > height(node.leftNode.leftNode)) {
+                // 左右的情形
+                leftRotate(node.leftNode);
             }
 
-            rightRotate(tree);
-        } else if (balanceFactor < 0) {
+            rightRotate(node);
+        } else if (balanceFactor < -AllowedImbalance) {
             // 右边高于左边
-            if (newNode != parent.rightNode) {
-                // 右左的插入情况
-                rightRotate(parent);
+            if (height(node.rightNode.leftNode) > height(node.rightNode.rightNode)) {
+                // 右左的情形
+                rightRotate(node.rightNode);
             }
 
-            leftRotate(tree);
+            leftRotate(node);
         }
     }
 
@@ -251,5 +224,44 @@ public class AvlTree<T extends Comparable<? super T>> {
         } else {
             node.height = 1;
         }
+    }
+
+    /**
+     * 寻找当前子树的最小节点
+     * @param node 需要寻找的子树头结点
+     * @return 最小节点
+     */
+    private AvlTreeNode<T> findMinNode(AvlTreeNode<T> node) {
+        if (node == null) {
+            return null;
+        } else if (node.leftNode == null) {
+            return node;
+        }
+
+        return findMinNode(node.leftNode);
+    }
+
+    /**
+     * 寻找当前子树的最大节点
+     * @param node 需要寻找的子树根节点
+     * @return 最大节点
+     */
+    private AvlTreeNode<T> findMaxNode(AvlTreeNode<T> node) {
+        if (node == null) {
+            return null;
+        } else if (node.rightNode == null) {
+            return node;
+        }
+
+        return findMaxNode(node.rightNode);
+    }
+
+    /**
+     * 返回指定节点的高度
+     * @param node 需要获得高度的节点
+     * @return 指定节点的高度，如果为空返回0
+     */
+    private int height(AvlTreeNode<T> node) {
+        return node != null ? node.height : 0;
     }
 }
