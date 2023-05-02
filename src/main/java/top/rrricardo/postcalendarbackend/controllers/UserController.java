@@ -49,7 +49,7 @@ public class UserController extends ControllerBase {
             return badRequest();
         }
 
-        var oldUser = getUser(id);
+        var oldUser = userMapper.getUserById(id);
         if (oldUser == null) {
             // 用户不存在
             return notFound("用户不存在");

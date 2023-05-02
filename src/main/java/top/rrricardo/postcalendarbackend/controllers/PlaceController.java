@@ -60,7 +60,7 @@ public class PlaceController extends ControllerBase {
             return badRequest();
         }
 
-        var oldPlace = getPlace(id);
+        var oldPlace = placeMapper.getPlaceById(id);
         if(oldPlace == null){
             //地点不存在
             return notFound("地点不存在");
@@ -74,7 +74,7 @@ public class PlaceController extends ControllerBase {
             throw new NullPointerException();
         }
 
-        return ok(place);
+        return ok(newPlace);
     }
 
     @DeleteMapping("/{id}")
@@ -91,8 +91,4 @@ public class PlaceController extends ControllerBase {
 
         return noContent();
     }
-
-
-
-
 }

@@ -61,7 +61,7 @@ public class RoadController extends ControllerBase {
             return badRequest();
         }
 
-        var oldRoad = getRoad(id);
+        var oldRoad = roadMapper.getRoadById(id);
         if(oldRoad == null){
             //道路不存在
             return notFound("道路不存在");
@@ -75,7 +75,7 @@ public class RoadController extends ControllerBase {
             throw new NullPointerException();
         }
 
-        return ok(road);
+        return ok(newRoad);
     }
 
     @DeleteMapping("/{id}")

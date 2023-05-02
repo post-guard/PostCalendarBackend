@@ -73,7 +73,7 @@ public class GroupController extends ControllerBase {
             return badRequest();
         }
 
-        var oldGroup = getGroup(id);
+        var oldGroup = groupMapper.getGroupById(id);
         if(oldGroup == null){
             //组织不存在
             return notFound("组织不存在");
