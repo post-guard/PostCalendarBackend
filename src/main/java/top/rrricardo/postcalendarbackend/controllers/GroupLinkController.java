@@ -5,13 +5,11 @@ import org.springframework.web.bind.annotation.*;
 import top.rrricardo.postcalendarbackend.annotations.Authorize;
 import top.rrricardo.postcalendarbackend.components.AuthorizeInterceptor;
 import top.rrricardo.postcalendarbackend.dtos.ResponseDTO;
-import top.rrricardo.postcalendarbackend.dtos.UserDTO;
 import top.rrricardo.postcalendarbackend.enums.AuthorizePolicy;
 import top.rrricardo.postcalendarbackend.enums.UserPermission;
 import top.rrricardo.postcalendarbackend.mappers.GroupLinkMapper;
 import top.rrricardo.postcalendarbackend.mappers.GroupMapper;
 import top.rrricardo.postcalendarbackend.mappers.UserMapper;
-import top.rrricardo.postcalendarbackend.models.Group;
 import top.rrricardo.postcalendarbackend.models.GroupLink;
 import top.rrricardo.postcalendarbackend.utils.Common;
 import top.rrricardo.postcalendarbackend.utils.ControllerBase;
@@ -37,16 +35,30 @@ public class GroupLinkController extends ControllerBase {
 
     @GetMapping("/group/{id}")
     @Authorize(policy = AuthorizePolicy.CURRENT_GROUP_USER)
-    public ResponseEntity<ResponseDTO<List<UserDTO>>> getUsersInGroup(@PathVariable(value = "id") int id) {
+    public ResponseEntity<ResponseDTO<List<GroupLink>>> getUsersInGroup(@PathVariable(value = "id") int id) {
         var group = groupMapper.getGroupById(id);
 
         if (group == null) {
             return badRequest("查询的组织不存在");
         }
 
-        var users = groupLinkMapper.getGroupLinksByGroupId(id);
+        var links = groupLinkMapper.getGroupLinksByGroupId(id);
 
-        return ok(UserDTO.arrayOf(users));
+        return ok(links);
+    }
+
+    @GetMapping("/user/{id}")
+    @Authorize(policy = AuthorizePolicy.CURRENT_USER)
+    public ResponseEntity<ResponseDTO<List<GroupLink>>> getGroupsOfUser(@PathVariable(value = "id") int id) {
+        var user = userMapper.getUserById(id);
+
+        if (user == null) {
+            return badRequest("查询的用户不存在");
+        }
+
+        var links = groupLinkMapper.getGroupLinksByUserId(id);
+
+        return ok(links);
     }
 
     @PostMapping("/group/{id}")
@@ -145,19 +157,5 @@ public class GroupLinkController extends ControllerBase {
             groupLinkMapper.deleteGroupLink(link.getId());
             return noContent();
         }
-    }
-
-    @GetMapping("/user/{id}")
-    @Authorize(policy = AuthorizePolicy.CURRENT_USER)
-    public ResponseEntity<ResponseDTO<List<Group>>> getGroupsOfUser(@PathVariable(value = "id") int id) {
-        var user = userMapper.getUserById(id);
-
-        if (user == null) {
-            return badRequest("查询的用户不存在");
-        }
-
-        var groups = groupLinkMapper.getGroupLinksByUserId(id);
-
-        return ok(groups);
     }
 }

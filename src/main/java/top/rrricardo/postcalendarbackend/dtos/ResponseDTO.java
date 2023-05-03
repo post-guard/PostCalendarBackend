@@ -34,6 +34,6 @@ public class ResponseDTO<T> implements Serializable {
 
     @Override
     public String toString() {
-        return "{\"message\": \"" + message + "\"}";
+        return "{\"message\": \"" + message + "\"," + "\"data\": \"" + data +  "\"}";
     }
 }
