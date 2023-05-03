@@ -21,14 +21,14 @@ public interface GroupLinkMapper {
      * @param userId 指定用户ID
      * @return 组织列表
      */
-    List<Group> getGroupLinksByUserId(int userId);
+    List<GroupLink> getGroupLinksByUserId(int userId);
 
     /**
      * 获得指定组织用户的用户列表
      * @param groupId 指定组织ID
      * @return 用户列表
      */
-    List<User> getGroupLinksByGroupId(int groupId);
+    List<GroupLink> getGroupLinksByGroupId(int groupId);
 
     /**
      * 获得指定的组织用户关系

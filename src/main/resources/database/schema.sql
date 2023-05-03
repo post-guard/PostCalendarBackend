@@ -15,10 +15,10 @@ create table if not exists `groups` (
     primary key (`id`)
 );
 
-create table if not exists `user-group-links` (
+create table if not exists `user_group_links` (
     `id` int not null auto_increment,
-    `user-id` int not null ,
-    `group-id` int not null ,
+    `userId` int not null ,
+    `groupId` int not null ,
     `permission` int not null,
     primary key (`id`)
 );
@@ -41,7 +41,7 @@ create table if not exists `roads` (
     primary key (`id`)
 );
 
-create table if not exists `time-span-events` (
+create table if not exists `time_span_events` (
     `id` int not null auto_increment,
     `name` text not null ,
     `details` text not null ,

@@ -3,45 +3,41 @@
 <mapper namespace="top.rrricardo.postcalendarbackend.mappers.GroupLinkMapper">
 
     <select id="getGroupLinks" resultType="GroupLink">
-        select * from `user-group-links`
+        select * from `user_group_links`
     </select>
 
     <select id="getGroupLinkById" parameterType="int" resultType="GroupLink">
-        select * from `user-group-links` where id=#{id}
+        select * from `user_group_links` where id=#{id}
     </select>
 
-    <select id="getGroupLinksByUserId" parameterType="int" resultType="Group">
-        select a.id, a.name, a.details
-        from `groups` a
-                 join `user-group-links` b on a.id = b.`group-id` and b.`user-id` = #{userId}
+    <select id="getGroupLinksByUserId" parameterType="int" resultType="GroupLink">
+        select * from `user_group_links` where `userId`=#{userId}
     </select>
 
-    <select id="getGroupLinksByGroupId" parameterType="int" resultType="User">
-        select a.id, a.username, a.emailAddress, a.password
-        from `users` a
-                 join `user-group-links` b on a.id = b.`user-id` and b.`group-id` = #{groupId}
+    <select id="getGroupLinksByGroupId" parameterType="int" resultType="GroupLink">
+        select * from `user_group_links` where `groupId`=#{gourpId}
     </select>
 
     <select id="getGroupLinkByUserIdAndGroupId" resultType="GroupLink">
-        select * from `user-group-links` where `user-id`=#{userId} and `group-id`=#{groupId}
+        select * from `user_group_links` where `userId`=#{userId} and `groupId`=#{groupId}
     </select>
 
     <insert id="createGroupLink" parameterType="GroupLink" useGeneratedKeys="true" keyProperty="id">
-        insert into `user-group-links` (`user-id`, `group-id`, `permission`)
+        insert into `user_group_links` (`userId`, `groupId`, `permission`)
         values (#{userId},
                 #{groupId},
                 #{permission})
     </insert>
 
     <update id="updateGroupLink" parameterType="GroupLink">
-        update `user-group-links`
-        set `user-id`=#{userId},
-            `group-id`=#{groupId},
+        update `user_group_links`
+        set `userId`=#{userId},
+            `groupId`=#{groupId},
             `permission`=#{permission}
         where id = #{id}
     </update>
 
     <delete id="deleteGroupLink" parameterType="int">
-        delete from `user-group-links` where id=#{id}
+        delete from `user_group_links` where id=#{id}
     </delete>
 </mapper>
