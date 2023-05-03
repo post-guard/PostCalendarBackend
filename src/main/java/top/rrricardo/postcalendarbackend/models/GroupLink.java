@@ -21,6 +21,10 @@ public class GroupLink {
         this.permission = permission;
     }
 
+    public GroupLink() {
+
+    }
+
     public int getUserId() {
         return userId;
     }
