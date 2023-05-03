@@ -13,6 +13,7 @@ import top.rrricardo.postcalendarbackend.mappers.GroupMapper;
 import top.rrricardo.postcalendarbackend.mappers.UserMapper;
 import top.rrricardo.postcalendarbackend.models.Group;
 import top.rrricardo.postcalendarbackend.models.GroupLink;
+import top.rrricardo.postcalendarbackend.utils.Common;
 import top.rrricardo.postcalendarbackend.utils.ControllerBase;
 
 import java.util.List;
@@ -58,6 +59,10 @@ public class GroupLinkController extends ControllerBase {
             return badRequest("请求的组织id不一致");
         }
 
+        if (id == Common.DefaultUsersGroupId) {
+            return badRequest("禁止向默认组织中添加用户");
+        }
+
         // 获得请求人的权限
         var client = AuthorizeInterceptor.getUserDTO();
         var clientLink = groupLinkMapper.getGroupLinkByUserIdAndGroupId(client.getId(), id);
@@ -79,7 +84,36 @@ public class GroupLinkController extends ControllerBase {
         } else {
             groupLinkMapper.createGroupLink(groupLink);
 
-            return created("创建用户成功", groupLink);
+            return created("添加用户到组织成功", groupLink);
+        }
+    }
+
+    @PutMapping("/group/{id}")
+    @Authorize(policy = AuthorizePolicy.CURRENT_GROUP_ADMINISTRATOR)
+    public ResponseEntity<ResponseDTO<GroupLink>> updateGroupLink(@PathVariable(value = "id") int id,
+                                                                  @RequestBody GroupLink groupLink) {
+        if (id != groupLink.getGroupId()) {
+            return badRequest("请求的组织ID不一致");
+        }
+
+        var client = AuthorizeInterceptor.getUserDTO();
+        var clientLink = groupLinkMapper.getGroupLinkByUserIdAndGroupId(client.getId(), id);
+
+        var link = groupLinkMapper.getGroupLinkById(groupLink.getId());
+
+        if (link == null) {
+            return notFound("指定的用户不在组织中");
+        }
+
+        if (link.getGroupId() != groupLink.getGroupId() || link.getUserId() != groupLink.getUserId()) {
+            return badRequest("禁止修改用户和组织");
+        }
+
+        if (link.getPermissionEnum().getCode() > clientLink.getPermissionEnum().getCode()) {
+            return forbidden("不能修改权限比自己高的用户", link);
+        } else {
+            groupLinkMapper.updateGroupLink(groupLink);
+            return ok(groupLink);
         }
     }
 
@@ -89,6 +123,10 @@ public class GroupLinkController extends ControllerBase {
                                                                   @RequestBody GroupLink groupLink) {
         if (id != groupLink.getGroupId()) {
             return badRequest("请求的组织ID不一致");
+        }
+
+        if (id == Common.DefaultUsersGroupId) {
+            return badRequest("默认组织中的用户禁止删除");
         }
 
         // 获得请求用户的权限
