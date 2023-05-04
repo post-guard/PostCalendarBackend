@@ -1,8 +1,6 @@
 package top.rrricardo.postcalendarbackend.utils.generic;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * 自行实现的数组列表
@@ -135,6 +133,20 @@ public class CustomList<E> implements Iterable<E>  {
     }
 
     /**
+     * 将当前列表转换为List
+     * @return 包含当前列表中所有元素的List
+     */
+    public List<E> toList() {
+        var list = new ArrayList<E>();
+
+        for(var item : this) {
+            list.add(item);
+        }
+
+        return list;
+    }
+
+    /**
      * 获得在指定索引的元素
      * @param index 指定的索引
      * @return 列表中指定索引的元素
@@ -218,7 +230,7 @@ public class CustomList<E> implements Iterable<E>  {
             System.arraycopy(elements, index + 1, elements, index, newSize - index);
         }
 
-        elements[index] = null;
+        elements[newSize] = null;
         size = newSize;
 
         if (size < elements.length / 2) {
