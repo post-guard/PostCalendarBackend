@@ -1,7 +1,6 @@
 package top.rrricardo.postcalendarbackend.utils;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.Assert;
 import top.rrricardo.postcalendarbackend.exceptions.AvlNodeRepeatException;
 import top.rrricardo.postcalendarbackend.utils.generic.AvlTree;
@@ -11,7 +10,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Random;
 
-@SpringBootTest
 public class AvlTreeTest {
 
     @Test
