@@ -47,8 +47,7 @@ public class PlaceController extends ControllerBase {
 
         placeMapper.createPlace(place);
 
-        return created();
-
+        return created(place);
     }
 
     @PutMapping("/{id}")

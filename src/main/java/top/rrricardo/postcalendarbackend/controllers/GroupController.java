@@ -60,8 +60,7 @@ public class GroupController extends ControllerBase {
         var link = new GroupLink(userDTO.getId(), group.getId(), UserPermission.ADMIN);
         groupLinkMapper.createGroupLink(link);
 
-        return created();
-
+        return created(group);
     }
 
     @PutMapping("/{id}")

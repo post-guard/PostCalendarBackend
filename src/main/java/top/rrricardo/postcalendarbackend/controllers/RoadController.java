@@ -48,8 +48,7 @@ public class RoadController extends ControllerBase {
 
         roadMapper.createRoad(road);
 
-        return created();
-
+        return created(road);
     }
 
     @PutMapping("/{id}")
