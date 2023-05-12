@@ -1,7 +1,7 @@
 package top.rrricardo.postcalendarbackend.utils;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.util.Assert;
 import top.rrricardo.postcalendarbackend.exceptions.AvlNodeRepeatException;
 import top.rrricardo.postcalendarbackend.utils.generic.AvlTree;
 
@@ -18,7 +18,7 @@ public class AvlTreeTest {
 
         tree.insert(1);
         var actual = tree.toString();
-        Assert.isTrue(actual.equals("1 "), actual);
+        Assertions.assertEquals("1 ", actual);
     }
 
     @Test
@@ -33,7 +33,7 @@ public class AvlTreeTest {
 
         var actual = tree.toString();
         var expect = "1 2 3 4 5 ";
-        Assert.isTrue(actual.equals(expect), actual);
+        Assertions.assertEquals(expect, actual);
     }
 
     @Test
@@ -48,7 +48,7 @@ public class AvlTreeTest {
 
         var actual = tree.toString();
         var expect = "1 2 3 4 5 ";
-        Assert.isTrue(actual.equals(expect), actual);
+        Assertions.assertEquals(expect, actual);
     }
 
     @Test
@@ -75,7 +75,7 @@ public class AvlTreeTest {
 
         var expect = builder.toString();
         var actual = tree.toString();
-        Assert.isTrue(expect.equals(actual), actual);
+        Assertions.assertEquals(expect, actual);
     }
 
     @Test
@@ -87,7 +87,7 @@ public class AvlTreeTest {
 
         var actual = tree.toString();
 
-        Assert.isTrue(actual.equals(""), actual);
+        Assertions.assertEquals("", actual);
     }
 
     @Test
@@ -105,7 +105,7 @@ public class AvlTreeTest {
         tree.remove(6);
 
         var actual = tree.toString();
-        Assert.isTrue(actual.equals("1 3 5 "), actual);
+        Assertions.assertEquals("1 3 5 ", actual);
     }
 
     @Test
@@ -135,9 +135,95 @@ public class AvlTreeTest {
         for (var input : testInput) {
             builder.append(input).append(' ');
         }
-        var except = builder.toString();
+        var expect = builder.toString();
         var actual = tree.toString();
 
-        Assert.isTrue(except.equals(actual), actual);
+        Assertions.assertEquals(expect, actual);
+    }
+
+    @Test
+    void TestIterator1() throws AvlNodeRepeatException {
+        var tree = new AvlTree<Integer>();
+
+        tree.insert(1);
+        tree.insert(2);
+        tree.insert(3);
+        tree.insert(4);
+        tree.insert(5);
+
+        var builder = new StringBuilder();
+        for(var node : tree) {
+            builder.append(node.toString()).append(' ');
+        }
+
+        Assertions.assertEquals("1 2 3 4 5 ", builder.toString());
+    }
+
+    @Test
+    void TestIterator2() throws AvlNodeRepeatException {
+        var tree = new AvlTree<Integer>();
+        var list = new ArrayList<Integer>();
+        var random = new Random();
+
+        for(var i = 0; i < 50; i++) {
+            var input = random.nextInt();
+
+            tree.insert(input);
+            list.add(input);
+        }
+
+        list.sort(Comparator.naturalOrder());
+
+        var i = 0;
+        for(var node : tree) {
+            Assertions.assertEquals(list.get(i), node);
+            i++;
+        }
+    }
+
+    @Test
+    void testSelectRange1() throws AvlNodeRepeatException {
+        var tree = new AvlTree<Integer>();
+
+        tree.insert(1);
+        tree.insert(3);
+        tree.insert(4);
+        tree.insert(5);
+        tree.insert(7);
+
+        var result = tree.selectRange(2, 5);
+        var builder = new StringBuilder();
+        for(var item : result) {
+            builder.append(item).append(' ');
+        }
+
+        Assertions.assertEquals("3 4 5 ", builder.toString());
+    }
+
+    @Test
+    void testSelectRange2() throws AvlNodeRepeatException {
+        var tree = new AvlTree<Integer>();
+        var list = new ArrayList<Integer>();
+        var random = new Random();
+
+        for(var i = 0; i < 500; i++) {
+            var input = random.nextInt();
+
+            tree.insert(input);
+            list.add(input);
+        }
+
+        list.sort(Comparator.naturalOrder());
+
+        int begin, end;
+        begin = list.get(123);
+        end = list.get(456);
+
+        var result = list.subList(123, 457);
+        var range = tree.selectRange(begin, end);
+
+        for (var i = 0; i < result.size(); i++) {
+            Assertions.assertEquals(result.get(i), range.get(i));
+        }
     }
 }

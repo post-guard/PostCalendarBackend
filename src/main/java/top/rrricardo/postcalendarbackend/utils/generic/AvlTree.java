@@ -2,11 +2,14 @@ package top.rrricardo.postcalendarbackend.utils.generic;
 
 import top.rrricardo.postcalendarbackend.exceptions.AvlNodeRepeatException;
 
+import java.util.Iterator;
+import java.util.Stack;
+
 /**
  * 平衡二叉树
  * @param <T> 节点中携带的数据
  */
-public class AvlTree<T extends Comparable<? super T>> {
+public class AvlTree<T extends Comparable<? super T>> implements Iterable<T> {
     private AvlTreeNode<T> root = null;
     // 最大允许的不平衡参数
     private static final int AllowedImbalance = 1;
@@ -35,6 +38,33 @@ public class AvlTree<T extends Comparable<? super T>> {
         remove(root, data);
     }
 
+    public CustomList<T> selectRange(T begin, T end) {
+        var result = new CustomList<T>();
+
+        var iterator = iterator();
+
+        while (iterator.hasNext()) {
+            var data = iterator.next();
+
+            if (data.compareTo(begin) >= 0) {
+                result.add(data);
+                break;
+            }
+        }
+
+        while (iterator.hasNext()) {
+            var data = iterator.next();
+
+            if (data.compareTo(end) <= 0) {
+                result.add(data);
+            } else {
+                break;
+            }
+        }
+
+        return result;
+    }
+
     @Override
     public String toString() {
         if (root == null) {
@@ -42,6 +72,11 @@ public class AvlTree<T extends Comparable<? super T>> {
         }
 
         return preorderPrint(root).toString();
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return new CustomIterator();
     }
 
     /**
@@ -322,5 +357,50 @@ public class AvlTree<T extends Comparable<? super T>> {
      */
     private int height(AvlTreeNode<T> node) {
         return node != null ? node.height : 0;
+    }
+
+    private class CustomIterator implements Iterator<T> {
+        private Stack<AvlTreeNode<T>> stack = new Stack<>();
+
+        public CustomIterator() {
+            appendNext(root);
+        }
+
+        @Override
+        public boolean hasNext() {
+            return !stack.empty();
+        }
+
+        @Override
+        public T next() {
+            if (!stack.empty()) {
+                var top = stack.pop();
+
+                if (top.rightNode != null) {
+                    appendNext(top.rightNode);
+                }
+
+                return top.getData();
+            } else {
+                return null;
+            }
+        }
+
+        /**
+         * 将一棵树的左子节点添加到栈中
+         * @param root 需要添加的树的根节点
+         */
+        private void appendNext(AvlTreeNode<T> root) {
+            if (root != null) {
+                var node = root;
+                stack.push(node);
+                node = node.leftNode;
+
+                while (node != null) {
+                    stack.push(node);
+                    node = node.leftNode;
+                }
+            }
+        }
     }
 }
