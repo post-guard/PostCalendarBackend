@@ -1,12 +1,13 @@
 package top.rrricardo.postcalendarbackend.utils.generic;
 
 import top.rrricardo.postcalendarbackend.exceptions.AvlNodeRepeatException;
+import top.rrricardo.postcalendarbackend.exceptions.CustomStackEmptyException;
 
 import java.util.Iterator;
-import java.util.Stack;
 
 /**
  * 平衡二叉树
+ *
  * @param <T> 节点中携带的数据
  */
 public class AvlTree<T extends Comparable<? super T>> implements Iterable<T> {
@@ -16,6 +17,7 @@ public class AvlTree<T extends Comparable<? super T>> implements Iterable<T> {
 
     /**
      * 想平衡树中插入一个节点
+     *
      * @param data 需要插入节点的数据
      * @throws AvlNodeRepeatException 同平衡树中的数据冲突
      */
@@ -32,6 +34,7 @@ public class AvlTree<T extends Comparable<? super T>> implements Iterable<T> {
 
     /**
      * 从节点中移除一个数据
+     *
      * @param data 需要移除的数据
      */
     public void remove(T data) {
@@ -81,6 +84,7 @@ public class AvlTree<T extends Comparable<? super T>> implements Iterable<T> {
 
     /**
      * 前序遍历打印节点
+     *
      * @param node 节点
      * @return 字符串构建类
      */
@@ -102,8 +106,9 @@ public class AvlTree<T extends Comparable<? super T>> implements Iterable<T> {
 
     /**
      * 插入节点
+     *
      * @param parent 父节点
-     * @param node 需要插入的节点
+     * @param node   需要插入的节点
      */
     private void insert(AvlTreeNode<T> parent, AvlTreeNode<T> node) throws AvlNodeRepeatException {
         var compareResult = node.data.compareTo(parent.data);
@@ -139,7 +144,8 @@ public class AvlTree<T extends Comparable<? super T>> implements Iterable<T> {
 
     /**
      * 从树中移除一个节点
-     * @param node 需要移除节点所在子树的根节点
+     *
+     * @param node       需要移除节点所在子树的根节点
      * @param removeData 需要移除的数据
      */
     private void remove(AvlTreeNode<T> node, T removeData) {
@@ -200,6 +206,7 @@ public class AvlTree<T extends Comparable<? super T>> implements Iterable<T> {
 
     /**
      * 节点向右旋转
+     *
      * @param node 不平衡的节点
      */
     private void rightRotate(AvlTreeNode<T> node) {
@@ -241,6 +248,7 @@ public class AvlTree<T extends Comparable<? super T>> implements Iterable<T> {
 
     /**
      * 节点向左旋转
+     *
      * @param node 需要旋转的节点
      */
     private void leftRotate(AvlTreeNode<T> node) {
@@ -274,6 +282,7 @@ public class AvlTree<T extends Comparable<? super T>> implements Iterable<T> {
 
     /**
      * 将树调整平衡
+     *
      * @param node 新插入/删除节点的父节点
      */
     private void balanceTree(AvlTreeNode<T> node) {
@@ -314,6 +323,7 @@ public class AvlTree<T extends Comparable<? super T>> implements Iterable<T> {
 
     /**
      * 重新计算树中每个节点的高度
+     *
      * @param node 需要计算的节点
      */
     private void reCalculateHeight(AvlTreeNode<T> node) {
@@ -337,6 +347,7 @@ public class AvlTree<T extends Comparable<? super T>> implements Iterable<T> {
 
     /**
      * 寻找当前子树的最小节点
+     *
      * @param node 需要寻找的子树头结点
      * @return 最小节点
      */
@@ -352,6 +363,7 @@ public class AvlTree<T extends Comparable<? super T>> implements Iterable<T> {
 
     /**
      * 返回指定节点的高度
+     *
      * @param node 需要获得高度的节点
      * @return 指定节点的高度，如果为空返回0
      */
@@ -360,7 +372,7 @@ public class AvlTree<T extends Comparable<? super T>> implements Iterable<T> {
     }
 
     private class CustomIterator implements Iterator<T> {
-        private final Stack<AvlTreeNode<T>> stack = new Stack<>();
+        private final CustomStack<AvlTreeNode<T>> stack = new CustomStack<>();
 
         public CustomIterator() {
             appendNext(root);
@@ -374,13 +386,19 @@ public class AvlTree<T extends Comparable<? super T>> implements Iterable<T> {
         @Override
         public T next() {
             if (!stack.empty()) {
-                var top = stack.pop();
+                try {
+                    var top = stack.pop();
 
-                if (top.rightNode != null) {
-                    appendNext(top.rightNode);
+                    if (top.rightNode != null) {
+                        appendNext(top.rightNode);
+                    }
+
+                    return top.getData();
+                } catch (CustomStackEmptyException ignored) {
+                    // 已经判空了
+                    // 按道理不会到达这里
+                    return null;
                 }
-
-                return top.getData();
             } else {
                 return null;
             }
@@ -388,6 +406,7 @@ public class AvlTree<T extends Comparable<? super T>> implements Iterable<T> {
 
         /**
          * 将一棵树的左子节点添加到栈中
+         *
          * @param root 需要添加的树的根节点
          */
         private void appendNext(AvlTreeNode<T> root) {
