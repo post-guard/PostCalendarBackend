@@ -1,11 +1,12 @@
 package top.rrricardo.postcalendarbackend.models;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 /**
  * 时间段类型的事件
  */
-public class TimeSpanEvent {
+public class TimeSpanEvent implements Comparable<TimeSpanEvent> {
     private int id;
     /**
      * 日程名称
@@ -94,5 +95,17 @@ public class TimeSpanEvent {
 
     public void setEndDateTime(LocalDateTime endDateTime) {
         this.endDateTime = endDateTime;
+    }
+
+    @Override
+    public int compareTo(TimeSpanEvent event) {
+        return getMiddleDateTime().compareTo(event.getMiddleDateTime());
+    }
+
+    private LocalDateTime getMiddleDateTime() {
+        var duration = Duration.between(beginDateTime, endDateTime);
+        duration = duration.dividedBy(2);
+
+        return beginDateTime.plus(duration);
     }
 }

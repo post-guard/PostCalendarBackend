@@ -360,7 +360,7 @@ public class AvlTree<T extends Comparable<? super T>> implements Iterable<T> {
     }
 
     private class CustomIterator implements Iterator<T> {
-        private Stack<AvlTreeNode<T>> stack = new Stack<>();
+        private final Stack<AvlTreeNode<T>> stack = new Stack<>();
 
         public CustomIterator() {
             appendNext(root);
