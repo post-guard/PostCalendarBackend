@@ -9,7 +9,7 @@ import java.util.List;
 public interface NavigationService {
 
     //用于获得邻接矩阵（同时得到地点id到matrix数组下标索引的映射）
-    public void getMatrix();
+    void getMatrix();
 
 
     /**
