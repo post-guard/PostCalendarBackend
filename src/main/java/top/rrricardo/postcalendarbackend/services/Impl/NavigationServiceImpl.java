@@ -88,7 +88,7 @@ public class NavigationServiceImpl implements NavigationService {
         boolean [] visited= new boolean [MAX]; //标记节点是否已找到最短路径
         Arrays.fill(visited, false);
         float [] distance = new float [MAX];  //节点到起点的距离
-        StringBuilder [] path = new StringBuilder[MAX]; //保存最短路径
+        String[] path = new String[MAX]; //保存最短路径
         PriorityQueue <Node> queue = new PriorityQueue<>();
 
         int start = map.get(Source);
@@ -99,13 +99,11 @@ public class NavigationServiceImpl implements NavigationService {
         int i;
         for(i = 0; i < MAX; i++){
 
-            path[i] = new StringBuilder(String.valueOf(start));
+            path[i] = start + "-" + i;
             if(i == start)
             {
                 continue;
             }
-            path[i].append("-");
-            path[i].append(i);
             distance[i] = matrix[start][i];
             if(distance[i] < 10000.0f)
             {
@@ -130,7 +128,7 @@ public class NavigationServiceImpl implements NavigationService {
                     //更新节点信息
                     if(distance[node.id] + matrix[node.id][j] < distance[j]){
                         distance[j] = distance[node.id] + matrix[node.id][j];
-                        path[j] = path[node.id].append("-").append(j);
+                        path[j] = path[node.id] + "-" + j;
                         queue.add(new Node(j, distance[j]));
                     }
                 }
