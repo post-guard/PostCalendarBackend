@@ -20,7 +20,8 @@ public class NavigationServiceImpl implements NavigationService {
     HashMap<Integer, Integer> map;
     float [][] matrix;  //邻接矩阵
     int MAX;            //节点数
-    CustomList<Place> places; //所有地点
+    CustomList<Place> allPlaces; //所有地点
+    CustomList <Road> allRoads; //所有道路
 
     public NavigationServiceImpl(PlaceMapper placeMapper, RoadMapper roadMapper) {
         this.placeMapper = placeMapper;
@@ -28,15 +29,41 @@ public class NavigationServiceImpl implements NavigationService {
         getMatrix();
     }
 
+    static class Node implements Comparable<Node>{
+        int id;
+        float distance;  //起点到这个点的距离
+
+        public Node(int id, float distance) {
+            this.id = id;
+            this.distance = distance;
+        }
+
+
+        @Override
+        public int compareTo(Node o) {
+            if(this.distance > o.distance){
+                return 1;
+            }
+            else if(this.distance < o.distance){
+                return -1;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+    }
+
     //得到邻接矩阵（同时得到地点id到matrix数组下标索引的映射）
     public void getMatrix(){
-        places = new CustomList<>(placeMapper.getPlaces());
-        MAX = places.getSize();
+        allPlaces = new CustomList<>(placeMapper.getPlaces());
+        MAX = allPlaces.getSize();
 
         //通过map将地点id映射为数组下标:0~MAX-1
         int i;
         for(i = 0; i < MAX; i++){
-            map.put(places.get(i).getId(), i);
+            map.put(allPlaces.get(i).getId(), i);
         }
 
         //初始化邻接矩阵
@@ -45,8 +72,8 @@ public class NavigationServiceImpl implements NavigationService {
         }
 
         //（更新）生成邻接矩阵
-        CustomList <Road> roads = new CustomList<>(roadMapper.getRoads());
-        for(var road: roads){
+        allRoads = new CustomList<>(roadMapper.getRoads());
+        for(var road: allRoads){
             int start = map.get(road.getStartPlaceId());
             int end = map.get(road.getEndPlaceId());
             float length = road.getLength();
@@ -56,7 +83,7 @@ public class NavigationServiceImpl implements NavigationService {
     }
 
 
-    public CustomList<Place> FindPath_OneDestination(int Source, int Destination){
+    public CustomList<Place> findPathOneDestination(int Source, int Destination){
         boolean [] visited= new boolean [MAX]; //标记节点是否已找到最短路径
         Arrays.fill(visited, false);
         float [] distance = new float [MAX];  //节点到起点的距离
@@ -108,7 +135,7 @@ public class NavigationServiceImpl implements NavigationService {
         String str = String.valueOf(path[end]);
         String [] array = str.split("-");
         for(i = 0; i < array.length; i++){
-            list.add(places.get(Integer.parseInt(array[i])));
+            list.add(allPlaces.get(Integer.parseInt(array[i])));
         }
 
 
@@ -116,34 +143,40 @@ public class NavigationServiceImpl implements NavigationService {
     }
 
 
-    public CustomList<Place> FindPath_ManyDestination(int Source, CustomList<Integer> middlePoints){
+    //这部分还没写......
+    public CustomList<Place> findPathManyDestination(int Source, CustomList<Integer> middlePoints){
         return null;
     }
 
-}
-
-class Node implements Comparable<Node>{
-    int id;
-    float distance;  //起点到这个点的距离
-
-    public Node(int id, float distance) {
-        this.id = id;
-        this.distance = distance;
-    }
-
-
     @Override
-    public int compareTo(Node o) {
-        if(this.distance > o.distance){
-            return 1;
+    public CustomList<Road> getRoadsByPlace(CustomList<Place> places) {
+        CustomList <Road> roads = new CustomList<>();
+
+        int i, j = 0;
+        int startId = places.get(j).getId();
+        int endId = places.get(j+1).getId();
+        while(true){
+
+            //遍历所有道路，找到以这两点为端点的道路
+            for(i = 0; i < allRoads.getSize(); i++){
+                Road road1 = allRoads.get(i);
+                if(road1.getStartPlaceId() == startId && road1.getEndPlaceId() == endId){
+                    roads.add(road1);
+                    break;
+                }
+            }
+
+            if(places.get(j + 2) == null)
+                break;
+
+            j++;
+            startId = places.get(j).getId();
+            endId = places.get(j+1).getId();
         }
-        else if(this.distance < o.distance){
-            return -1;
-        }
-        else
-        {
-            return 0;
-        }
+
+        return roads;
     }
 
 }
+
+
