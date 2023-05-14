@@ -88,23 +88,30 @@ public class NavigationServiceImpl implements NavigationService {
         boolean [] visited= new boolean [MAX]; //标记节点是否已找到最短路径
         Arrays.fill(visited, false);
         float [] distance = new float [MAX];  //节点到起点的距离
-        Arrays.fill(distance, Float.MAX_VALUE);
         StringBuilder [] path = new StringBuilder[MAX]; //保存最短路径
+        PriorityQueue <Node> queue = new PriorityQueue<>();
 
         int start = map.get(Source);
         int end = map.get(Destination);
+        distance[start] = 0.0f;
 
         //初始化路径
         int i;
         for(i = 0; i < MAX; i++){
+
             path[i] = new StringBuilder(String.valueOf(start));
+            if(i == start)
+            {
+                continue;
+            }
             path[i].append("-");
             path[i].append(i);
+            distance[i] = matrix[start][i];
+            if(distance[i] < 10000.0f)
+            {
+                queue.add(new Node(i, distance[i]));
+            }
         }
-
-
-        PriorityQueue <Node> queue = new PriorityQueue<>();
-        queue.add(new Node(start, 0.0f));          //先将起点和到自身的距离加入优先队列
 
         while(queue.size() != 0 && !visited[end]){
             Node node = queue.poll();
@@ -124,7 +131,6 @@ public class NavigationServiceImpl implements NavigationService {
                     if(distance[node.id] + matrix[node.id][j] < distance[j]){
                         distance[j] = distance[node.id] + matrix[node.id][j];
                         path[j] = path[node.id].append("-").append(j);
-
                         queue.add(new Node(j, distance[j]));
                     }
                 }
@@ -157,12 +163,14 @@ public class NavigationServiceImpl implements NavigationService {
         int i, j = 0;
         int startId = places.get(j).getId();
         int endId = places.get(j+1).getId();
+
+        outLoop:
         while(true){
 
             //遍历所有道路，找到以这两点为端点的道路
             for(i = 0; i < allRoads.getSize(); i++){
                 Road road1 = allRoads.get(i);
-                if(road1.getStartPlaceId() == startId && road1.getEndPlaceId() == endId){
+                if(road1.getStartPlaceId() == startId && road1.getEndPlaceId() == endId || road1.getStartPlaceId() == endId && road1.getEndPlaceId() == startId){
                     roads.add(road1);
                     break;
                 }
