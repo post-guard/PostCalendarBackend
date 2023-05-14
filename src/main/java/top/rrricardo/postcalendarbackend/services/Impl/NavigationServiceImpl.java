@@ -17,7 +17,7 @@ public class NavigationServiceImpl implements NavigationService {
 
     PlaceMapper placeMapper;
     RoadMapper roadMapper;
-    HashMap<Integer, Integer> map;
+    HashMap<Integer, Integer> map = new HashMap<>();
     float [][] matrix;  //邻接矩阵
     int MAX;            //节点数
     CustomList<Place> allPlaces; //所有地点
@@ -59,6 +59,7 @@ public class NavigationServiceImpl implements NavigationService {
     public void getMatrix(){
         allPlaces = new CustomList<>(placeMapper.getPlaces());
         MAX = allPlaces.getSize();
+        matrix = new float[MAX][MAX];
 
         //通过map将地点id映射为数组下标:0~MAX-1
         int i;
@@ -90,16 +91,17 @@ public class NavigationServiceImpl implements NavigationService {
         Arrays.fill(distance, Float.MAX_VALUE);
         StringBuilder [] path = new StringBuilder[MAX]; //保存最短路径
 
+        int start = map.get(Source);
+        int end = map.get(Destination);
+
         //初始化路径
         int i;
         for(i = 0; i < MAX; i++){
-            path[i] = new StringBuilder(String.valueOf(Source));
+            path[i] = new StringBuilder(String.valueOf(start));
             path[i].append("-");
             path[i].append(i);
         }
 
-        int start = map.get(Source);
-        int end = map.get(Destination);
 
         PriorityQueue <Node> queue = new PriorityQueue<>();
         queue.add(new Node(start, 0.0f));          //先将起点和到自身的距离加入优先队列
