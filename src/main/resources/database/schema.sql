@@ -37,7 +37,7 @@ create table if not exists `roads` (
     `name` text not null ,
     `startPlaceId` int not null ,
     `endPlaceId` int not null ,
-    `length` int not null ,
+    `length` float not null ,
     primary key (`id`)
 );
 

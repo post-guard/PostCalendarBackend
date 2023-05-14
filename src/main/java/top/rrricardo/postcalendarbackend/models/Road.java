@@ -6,9 +6,9 @@ public class Road {
     private String name;
     private int startPlaceId;
     private int endPlaceId;
-    private int length;
+    private float length;
 
-    public Road(int id, String name, int startPlaceId, int endPlaceId, int length){
+    public Road(int id, String name, int startPlaceId, int endPlaceId, float length){
         this.id = id;
         this.name = name;
         this.startPlaceId = startPlaceId;
@@ -22,11 +22,11 @@ public class Road {
 
     public void setName(String name) { this.name = name; }
 
-    public int getLength() {
+    public float getLength() {
         return length;
     }
 
-    public void setLength(int length) {
+    public void setLength(float length) {
         this.length = length;
     }
 
