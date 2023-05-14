@@ -1,6 +1,7 @@
 package top.rrricardo.postcalendarbackend.services;
 
 import top.rrricardo.postcalendarbackend.models.Place;
+import top.rrricardo.postcalendarbackend.models.Road;
 import top.rrricardo.postcalendarbackend.utils.generic.CustomList;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public interface NavigationService {
      * @param Destination 终点id
      * @return 起点到终点的最短路径
      */
-    public CustomList<Place> FindPath_OneDestination(int Source, int Destination);
+    CustomList<Place> findPathOneDestination(int Source, int Destination);
 
 
 
@@ -27,5 +28,8 @@ public interface NavigationService {
      * @param middlePoints 需要途径的点集合
      * @return 途径多点的最短路径
      */
-    public CustomList<Place> FindPath_ManyDestination(int Source, CustomList<Integer> middlePoints);
+    CustomList<Place> findPathManyDestination(int Source, CustomList<Integer> middlePoints);
+
+    //通过地点序列找到道路序列
+    CustomList<Road> getRoadsByPlace(CustomList<Place> places);
 }
