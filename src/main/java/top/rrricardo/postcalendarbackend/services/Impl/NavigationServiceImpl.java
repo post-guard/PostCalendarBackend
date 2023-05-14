@@ -168,8 +168,11 @@ public class NavigationServiceImpl implements NavigationService {
                 }
             }
 
-            if(places.get(j + 2) == null)
+            try {
+                places.get(j + 2);
+            } catch (ArrayIndexOutOfBoundsException ignored) {
                 break;
+            }
 
             j++;
             startId = places.get(j).getId();
