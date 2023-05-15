@@ -6,18 +6,18 @@ import top.rrricardo.postcalendarbackend.mappers.RoadMapper;
 import top.rrricardo.postcalendarbackend.models.Place;
 import top.rrricardo.postcalendarbackend.models.Road;
 import top.rrricardo.postcalendarbackend.services.NavigationService;
+import top.rrricardo.postcalendarbackend.utils.generic.CustomHashTable;
 import top.rrricardo.postcalendarbackend.utils.generic.CustomList;
+import top.rrricardo.postcalendarbackend.utils.generic.Heap;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.PriorityQueue;
 
 @Service
 public class NavigationServiceImpl implements NavigationService {
 
     PlaceMapper placeMapper;
     RoadMapper roadMapper;
-    HashMap<Integer, Integer> map = new HashMap<>();
+    CustomHashTable<Integer, Integer> map = new CustomHashTable<>();
     float [][] matrix;  //邻接矩阵
     int MAX;            //节点数
     CustomList<Place> allPlaces; //所有地点
@@ -89,7 +89,7 @@ public class NavigationServiceImpl implements NavigationService {
         Arrays.fill(visited, false);
         float [] distance = new float [MAX];  //节点到起点的距离
         String[] path = new String[MAX]; //保存最短路径
-        PriorityQueue <Node> queue = new PriorityQueue<>();
+        Heap <Node> queue = new Heap<>();
 
         int start = map.get(Source);
         int end = map.get(Destination);
@@ -111,7 +111,7 @@ public class NavigationServiceImpl implements NavigationService {
             }
         }
 
-        while(queue.size() != 0 && !visited[end]){
+        while(queue.getSize() != 0 && !visited[end]){
             Node node = queue.poll();
 
             if(visited[node.id])        //如果节点的最短路径已经找到，则跳至下一次循环
