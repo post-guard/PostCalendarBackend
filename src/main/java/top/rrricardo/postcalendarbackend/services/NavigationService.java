@@ -7,10 +7,10 @@ import top.rrricardo.postcalendarbackend.utils.generic.CustomList;
 import java.util.List;
 
 public interface NavigationService {
-
-    //用于获得邻接矩阵（同时得到地点id到matrix数组下标索引的映射）
-    void getMatrix();
-
+    /**
+     * 设置地图状态为已更新
+     */
+    void setMapUpdated();
 
     /**
      * 寻找最短路径（一个起点、一个终点）

@@ -23,6 +23,8 @@ public class NavigationServiceImpl implements NavigationService {
     CustomList<Place> allPlaces; //所有地点
     CustomList <Road> allRoads; //所有道路
 
+    private boolean mapUpdated = false;
+
     public NavigationServiceImpl(PlaceMapper placeMapper, RoadMapper roadMapper) {
         this.placeMapper = placeMapper;
         this.roadMapper = roadMapper;
@@ -55,8 +57,10 @@ public class NavigationServiceImpl implements NavigationService {
 
     }
 
-    //得到邻接矩阵（同时得到地点id到matrix数组下标索引的映射）
-    public void getMatrix(){
+    /**
+     * 得到邻接矩阵（同时得到地点id到matrix数组下标索引的映射）
+     */
+    private void getMatrix(){
         allPlaces = new CustomList<>(placeMapper.getPlaces());
         MAX = allPlaces.getSize();
         matrix = new float[MAX][MAX];
@@ -85,6 +89,12 @@ public class NavigationServiceImpl implements NavigationService {
 
 
     public CustomList<Place> findPathOneDestination(int Source, int Destination){
+        if (mapUpdated) {
+            getMatrix();
+            mapUpdated = false;
+        }
+
+
         boolean [] visited= new boolean [MAX]; //标记节点是否已找到最短路径
         Arrays.fill(visited, false);
         float [] distance = new float [MAX];  //节点到起点的距离
@@ -150,6 +160,7 @@ public class NavigationServiceImpl implements NavigationService {
 
 
     //这部分还没写......
+    @Override
     public CustomList<Place> findPathManyDestination(int Source, CustomList<Integer> middlePoints){
         return null;
     }
@@ -188,6 +199,10 @@ public class NavigationServiceImpl implements NavigationService {
         return roads;
     }
 
+    @Override
+    public void setMapUpdated() {
+        mapUpdated = true;
+    }
 }
 
 

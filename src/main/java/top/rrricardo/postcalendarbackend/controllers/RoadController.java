@@ -7,6 +7,7 @@ import top.rrricardo.postcalendarbackend.dtos.ResponseDTO;
 import top.rrricardo.postcalendarbackend.enums.AuthorizePolicy;
 import top.rrricardo.postcalendarbackend.mappers.RoadMapper;
 import top.rrricardo.postcalendarbackend.models.Road;
+import top.rrricardo.postcalendarbackend.services.NavigationService;
 import top.rrricardo.postcalendarbackend.utils.ControllerBase;
 
 import java.util.List;
@@ -16,10 +17,12 @@ import java.util.List;
 public class RoadController extends ControllerBase {
 
     private final RoadMapper roadMapper;
+    private final NavigationService navigationService;
 
 
-    public RoadController(RoadMapper roadMapper) {
+    public RoadController(RoadMapper roadMapper, NavigationService navigationService) {
         this.roadMapper = roadMapper;
+        this.navigationService = navigationService;
     }
 
     @GetMapping("/")
@@ -47,6 +50,7 @@ public class RoadController extends ControllerBase {
     public ResponseEntity<ResponseDTO<Road>> createRoad(@RequestBody Road road){
 
         roadMapper.createRoad(road);
+        navigationService.setMapUpdated();
 
         return created(road);
     }
@@ -67,6 +71,7 @@ public class RoadController extends ControllerBase {
         }
 
         roadMapper.updateRoad(road);
+        navigationService.setMapUpdated();
 
         var newRoad = roadMapper.getRoadById(id);
 
@@ -88,6 +93,7 @@ public class RoadController extends ControllerBase {
         }
 
         roadMapper.deleteRoad(id);
+        navigationService.setMapUpdated();
 
         return noContent();
     }

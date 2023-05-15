@@ -7,6 +7,7 @@ import top.rrricardo.postcalendarbackend.dtos.ResponseDTO;
 import top.rrricardo.postcalendarbackend.enums.AuthorizePolicy;
 import top.rrricardo.postcalendarbackend.mappers.PlaceMapper;
 import top.rrricardo.postcalendarbackend.models.Place;
+import top.rrricardo.postcalendarbackend.services.NavigationService;
 import top.rrricardo.postcalendarbackend.utils.ControllerBase;
 
 import java.util.List;
@@ -16,9 +17,11 @@ import java.util.List;
 public class PlaceController extends ControllerBase {
 
     private final PlaceMapper placeMapper;
+    private final NavigationService navigationService;
 
-    public PlaceController(PlaceMapper placeMapper) {
+    public PlaceController(PlaceMapper placeMapper, NavigationService navigationService) {
         this.placeMapper = placeMapper;
+        this.navigationService = navigationService;
     }
 
     @GetMapping("/")
@@ -46,6 +49,7 @@ public class PlaceController extends ControllerBase {
     public ResponseEntity<ResponseDTO<Place>> createPlace(@RequestBody Place place){
 
         placeMapper.createPlace(place);
+        navigationService.setMapUpdated();
 
         return created(place);
     }
@@ -66,6 +70,7 @@ public class PlaceController extends ControllerBase {
         }
 
         placeMapper.updatePlace(place);
+        navigationService.setMapUpdated();
 
         var newPlace = placeMapper.getPlaceById(id);
 
@@ -87,6 +92,7 @@ public class PlaceController extends ControllerBase {
         }
 
         placeMapper.deletePlace(id);
+        navigationService.setMapUpdated();
 
         return noContent();
     }
