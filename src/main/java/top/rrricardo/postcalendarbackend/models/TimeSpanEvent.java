@@ -102,6 +102,46 @@ public class TimeSpanEvent implements Comparable<TimeSpanEvent> {
         return getMiddleDateTime().compareTo(event.getMiddleDateTime());
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (obj == null) {
+            return false;
+        }
+
+        if (obj instanceof TimeSpanEvent event) {
+            return name.equals(event.name)
+                    && details.equals(event.details)
+                    && (userId == event.userId || groupId == event.groupId)
+                    && placeId == event.placeId
+                    && beginDateTime.equals(event.beginDateTime)
+                    && endDateTime.equals(event.endDateTime);
+        }
+
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        var builder = new StringBuilder();
+
+        builder.append("事件名称：").append(name).append('\n');
+        builder.append("事件详情：").append(details).append('\n');
+        builder.append("事件发生的地点ID：").append(placeId).append('\n');
+        if (userId != 0 && groupId == 0) {
+            builder.append("用户ID：").append(userId).append('\n');
+        } else if (userId == 0 && groupId != 0) {
+            builder.append("组织ID：").append(groupId).append('\n');
+        }
+        builder.append("开始时间：").append(beginDateTime).append('\n');
+        builder.append("结束时间：").append(endDateTime).append('\n');
+
+        return builder.toString();
+    }
+
     private LocalDateTime getMiddleDateTime() {
         var duration = Duration.between(beginDateTime, endDateTime);
         duration = duration.dividedBy(2);
