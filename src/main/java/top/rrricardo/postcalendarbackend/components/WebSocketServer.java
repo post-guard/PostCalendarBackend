@@ -1,9 +1,6 @@
 package top.rrricardo.postcalendarbackend.components;
 
-import jakarta.websocket.OnClose;
-import jakarta.websocket.OnMessage;
-import jakarta.websocket.OnOpen;
-import jakarta.websocket.Session;
+import jakarta.websocket.*;
 import jakarta.websocket.server.ServerEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +41,7 @@ public class WebSocketServer {
         sendTextMessage("收到： " + message);
     }
 
+    @OnError
     public void onError(Session session, Throwable exception) {
         logger.warn("遇到错误：" + exception.getMessage());
     }

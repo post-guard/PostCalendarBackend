@@ -2,15 +2,15 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="top.rrricardo.postcalendarbackend.mappers.TimeSpanEventMapper">
     <select id="getEvents" resultType="TimeSpanEvent">
-        select * from `time-span-events`
+        select * from `time_span_events`
     </select>
 
     <select id="getEventById" parameterType="int" resultType="TimeSpanEvent">
-        select * from `time-span-events` where `id` = #{id}
+        select * from `time_span_events` where `id` = #{id}
     </select>
 
     <insert id="createEvent" parameterType="TimeSpanEvent" useGeneratedKeys="true" keyProperty="id">
-        insert into `time-span-events` (`name`, `details`, `userId`, `groupId`, `placeId`, `beginDateTime`,
+        insert into `time_span_events` (`name`, `details`, `userId`, `groupId`, `placeId`, `beginDateTime`,
                                         `endDateTime`)
         values (#{name},
                 #{details},
@@ -22,7 +22,7 @@
     </insert>
 
     <update id="updateEvent" parameterType="TimeSpanEvent">
-        update `time-span-events`
+        update `time_span_events`
         set `name`=#{name},
             `details`=#{details},
             `userId`=#{userId},
@@ -34,7 +34,7 @@
     </update>
 
     <delete id="deleteEvent" parameterType="int">
-        delete from `time-span-events` where `id` = #{id}
+        delete from `time_span_events` where `id` = #{id}
     </delete>
 
 </mapper>
