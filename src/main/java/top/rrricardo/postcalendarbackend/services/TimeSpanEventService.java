@@ -39,7 +39,7 @@ public abstract class TimeSpanEventService {
      * @param end   结束时间
      * @return 事件列表
      */
-    public abstract CustomList<TimeSpanEvent> queryEvent(int id, LocalDateTime begin, LocalDateTime end);
+    public abstract CustomList<TimeSpanEvent> queryEvent(int id, LocalDateTime begin, LocalDateTime end) throws TimeSpanEventException;
 
     /**
      * 添加事件辅助函数
@@ -127,6 +127,26 @@ public abstract class TimeSpanEventService {
                 throw new TimeSpanEventException("发生冲突");
             }
         }
+    }
+
+    protected CustomList<TimeSpanEvent> queryEventHelper(CustomHashTable<Integer, AvlTree<TimeSpanEvent>> forest,
+                                                         int id, LocalDateTime begin, LocalDateTime end)
+            throws TimeSpanEventException {
+        var tree = forest.get(id);
+
+        if (tree == null) {
+            throw new TimeSpanEventException("属主：" + id + "不存在");
+        }
+
+        var beginTimeObj = new TimeSpanEvent();
+        beginTimeObj.setBeginDateTime(begin);
+        beginTimeObj.setEndDateTime(begin);
+
+        var endTimeObj = new TimeSpanEvent();
+        endTimeObj.setBeginDateTime(end);
+        endTimeObj.setEndDateTime(end);
+
+        return tree.selectRange(beginTimeObj, endTimeObj);
     }
 
 

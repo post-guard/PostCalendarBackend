@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.*;
 import top.rrricardo.postcalendarbackend.annotations.Authorize;
 import top.rrricardo.postcalendarbackend.dtos.ResponseDTO;
 import top.rrricardo.postcalendarbackend.enums.AuthorizePolicy;
+import top.rrricardo.postcalendarbackend.exceptions.TimeSpanEventException;
+import top.rrricardo.postcalendarbackend.mappers.GroupMapper;
 import top.rrricardo.postcalendarbackend.mappers.TimeSpanEventMapper;
 import top.rrricardo.postcalendarbackend.mappers.UserMapper;
 import top.rrricardo.postcalendarbackend.models.TimeSpanEvent;
@@ -21,12 +23,17 @@ import java.util.Map;
 @RequestMapping("/timeSpanEvent")
 public class TimeSpanEventController extends ControllerBase {
     private final UserMapper userMapper;
+    private final GroupMapper groupMapper;
     private final TimeSpanEventMapper eventMapper;
     private final TimeSpanEventService userTimeSpanEventService;
     private final TimeSpanEventService groupTimeSpanEventService;
 
-    public TimeSpanEventController(TimeSpanEventMapper eventMapper, UserMapper userMapper, Map<String, TimeSpanEventService> serviceMap) {
+    public TimeSpanEventController(TimeSpanEventMapper eventMapper,
+                                   UserMapper userMapper,
+                                   GroupMapper groupMapper,
+                                   Map<String, TimeSpanEventService> serviceMap) {
         this.userMapper = userMapper;
+        this.groupMapper = groupMapper;
         this.eventMapper = eventMapper;
         this.userTimeSpanEventService = serviceMap.get("userTimeSpanEvent");
         this.groupTimeSpanEventService = serviceMap.get("groupTimeSpanEvent");
@@ -58,7 +65,7 @@ public class TimeSpanEventController extends ControllerBase {
             var result = userTimeSpanEventService.queryEvent(id, beginTime, endTime);
 
             return ok(result.toList());
-        } catch (IllegalArgumentException e) {
+        } catch (TimeSpanEventException e) {
             return badRequest(e.getMessage());
         }
     }
@@ -78,11 +85,16 @@ public class TimeSpanEventController extends ControllerBase {
             return notFound("用户不存在");
         }
 
+        var oldEvent = eventMapper.getEventById(event.getId());
+        if (oldEvent == null) {
+            return notFound("事件不存在");
+        }
+
         try {
             userTimeSpanEventService.addEvent(event);
 
             return created(event);
-        } catch (IllegalArgumentException e) {
+        } catch (TimeSpanEventException e) {
             return badRequest(e.getMessage());
         }
     }
@@ -103,7 +115,7 @@ public class TimeSpanEventController extends ControllerBase {
             userTimeSpanEventService.updateEvent(event);
 
             return ok(event);
-        } catch (IllegalArgumentException e) {
+        } catch (TimeSpanEventException e) {
             return badRequest(e.getMessage());
         }
     }
@@ -123,7 +135,7 @@ public class TimeSpanEventController extends ControllerBase {
         var oldEvent = eventMapper.getEventById(event.getId());
 
         if (oldEvent == null) {
-            return notFound("要删除的时间不存在");
+            return notFound("要删除的事件不存在");
         }
 
         if (!event.equals(oldEvent)) {
@@ -133,7 +145,115 @@ public class TimeSpanEventController extends ControllerBase {
         try {
             userTimeSpanEventService.removeEvent(event);
             return noContent();
-        } catch (IllegalArgumentException e) {
+        } catch (TimeSpanEventException e) {
+            return badRequest(e.getMessage());
+        }
+    }
+
+    @GetMapping("/group/{id}")
+    @Authorize(policy = AuthorizePolicy.CURRENT_GROUP_USER)
+    public ResponseEntity<ResponseDTO<List<TimeSpanEvent>>> getGroupEvent(
+            @PathVariable int id,
+            @RequestParam long begin,
+            @RequestParam long end
+    ) {
+        if (begin >= end) {
+            return badRequest("开始时间晚于结束时间");
+        }
+
+        var group = groupMapper.getGroupById(id);
+        if (group == null) {
+            return notFound("组织不存在");
+        }
+
+        var instant = Instant.ofEpochSecond(begin);
+        var beginTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+        instant = Instant.ofEpochSecond(end);
+        var endTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+
+        try {
+            var result = groupTimeSpanEventService.queryEvent(id, beginTime, endTime);
+
+            return ok(result.toList());
+        } catch (TimeSpanEventException e) {
+            return badRequest(e.getMessage());
+        }
+    }
+
+    @PostMapping("/group/{id}")
+    @Authorize(policy = AuthorizePolicy.CURRENT_GROUP_USER)
+    public ResponseEntity<ResponseDTO<TimeSpanEvent>> addGroupEvent(
+            @PathVariable int id,
+            @RequestBody TimeSpanEvent event
+    ) {
+        if (id != event.getGroupId()) {
+            return badRequest("请求的组织ID和事件组织ID不一致");
+        }
+
+        var group = groupMapper.getGroupById(id);
+        if (group == null) {
+            return notFound("请求的组织不存在");
+        }
+
+        var oldEvent = eventMapper.getEventById(event.getId());
+        if (oldEvent == null) {
+            return notFound("事件不存在");
+        }
+
+        try {
+            groupTimeSpanEventService.addEvent(event);
+
+            return created(event);
+        } catch (TimeSpanEventException e) {
+            return badRequest(e.getMessage());
+        }
+    }
+
+    @PutMapping("/group/{id}")
+    @Authorize(policy = AuthorizePolicy.CURRENT_GROUP_USER)
+    public ResponseEntity<ResponseDTO<TimeSpanEvent>> updateGroupEvent(
+            @PathVariable int id,
+            @RequestBody TimeSpanEvent event
+    ) {
+        var group = groupMapper.getGroupById(id);
+        if (group == null) {
+            return notFound("请求的组织不存在");
+        }
+
+        try {
+            groupTimeSpanEventService.updateEvent(event);
+
+            return ok(event);
+        } catch (TimeSpanEventException e) {
+            return badRequest(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/group/{id}")
+    @Authorize(policy = AuthorizePolicy.CURRENT_GROUP_USER)
+    public ResponseEntity<ResponseDTO<TimeSpanEvent>> removeGroupEvent(
+            @PathVariable int id,
+            @RequestBody TimeSpanEvent event
+    ) {
+        var group = groupMapper.getGroupById(id);
+        if (group == null) {
+            return notFound("请求的用户不存在");
+        }
+
+        var oldEvent = eventMapper.getEventById(event.getId());
+
+        if (oldEvent == null) {
+            return notFound("要删除的事件不存在");
+        }
+
+        if (!event.equals(oldEvent)) {
+            return badRequest("要删除的事件信息同数据库不符");
+        }
+
+        try {
+            groupTimeSpanEventService.updateEvent(event);
+            return noContent();
+        } catch (TimeSpanEventException e) {
             return badRequest(e.getMessage());
         }
     }
