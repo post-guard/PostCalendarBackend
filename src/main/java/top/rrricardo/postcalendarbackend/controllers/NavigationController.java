@@ -49,7 +49,7 @@ public class NavigationController extends ControllerBase {
     public ResponseEntity<ResponseDTO<NavigationDTO>> getNavigationMany(
             @RequestBody List<Integer> places
     ) {
-        if (places.size() < 2) {
+        if (places.size() <= 2) {
             return badRequest("请求的地点数过少");
         }
 

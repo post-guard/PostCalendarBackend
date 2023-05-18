@@ -205,13 +205,10 @@ public class NavigationServiceImpl implements NavigationService {
             static int[] pos = new int[N];
             static boolean[] flag = new boolean[N];
 
-            static int count;
-
             static CustomList<CustomList<Integer>> list = new CustomList<>();
 
             public static void dfs(int u) {
                 if (u == n) {
-                    count++;
                     CustomList<Integer> list1 = new CustomList<>();
                     for (int i = 0; i < n; i++) {
                         list1.add(pos[i]);
@@ -241,8 +238,8 @@ public class NavigationServiceImpl implements NavigationService {
         CustomList<Integer> minList = list2.get(0);
         float min = Float.MAX_VALUE;
         for(var list3: list2){
-            float sum = matrix2[0][list3.get(1)];  //第一步必定是从起点开始走出去
-            i = 1;
+            float sum = matrix2[0][list3.get(0)];  //第一步必定是从起点开始走出去
+            i = 0;
             while(i + 1 < list3.getSize()){
                 sum = sum + matrix2[list3.get(i)][list3.get(i+1)];
                 i++;
@@ -252,7 +249,8 @@ public class NavigationServiceImpl implements NavigationService {
                 }
             }
 
-            sum = sum + matrix2[i][0];  //最后一步必定是回到起点
+
+            sum = sum + matrix2[list3.get(i)][0];  //最后一步必定是回到起点
 
             //更新最短路径
             if(sum < min){
@@ -263,24 +261,36 @@ public class NavigationServiceImpl implements NavigationService {
 
         //根据得到的最短环路的索引的全排列，还原出整个路径
         CustomList<Place> reList = map3.get(0).get(minList.get(0));
+        CustomList <Place> tempList = new CustomList<>();
         for(i = 0; i + 1 < minList.getSize(); i++){
-            CustomList <Place> tempList = new CustomList<>();
-            //因为map3只存了上三角，所以要判断一下
-            if(map3.get(i).get(i+1) == null){
-                tempList = map3.get(i+1).get(i);
+            //因为map3只存了上三角，所以要分类讨论
+            if(map3.get(minList.get(i)).get(minList.get(i+1)) == null){
+                tempList = map3.get(minList.get(i+1)).get(minList.get(i));
+                tempList.remove(tempList.getSize() - 1); //移除中间重复节点(最后一个)
+                //将tempList“倒着”并入reList
+                for(i = tempList.getSize() - 1; i >= 0; i--){
+                    reList.add(tempList.get(i));
+                }
             }
             else{
 
-                tempList = map3.get(i).get(i+1);
+                tempList = map3.get(minList.get(i)).get(minList.get(i+1));
+                tempList.remove(0); //移除中间重复节点(第一个)
+                //将tempList直接并入reList
+                for(var value: tempList){
+                    reList.add(value);
+                }
             }
 
-            tempList.remove(0); //移除中间重复节点
 
-            //将tempList并入reList
-            for(var value: tempList){
-                reList.add(value);
-            }
 
+        }
+
+        //最后要回到起点
+        tempList = map3.get(0).get(minList.get(i));
+        tempList.remove(tempList.getSize() - 1);
+        for(i = tempList.getSize() - 1; i >= 0; i--){
+            reList.add(tempList.get(i));
         }
 
         return reList;
