@@ -6,6 +6,7 @@ import top.rrricardo.postcalendarbackend.annotations.Authorize;
 import top.rrricardo.postcalendarbackend.dtos.ResponseDTO;
 import top.rrricardo.postcalendarbackend.enums.AuthorizePolicy;
 import top.rrricardo.postcalendarbackend.exceptions.TimeSpanEventException;
+import top.rrricardo.postcalendarbackend.mappers.GroupLinkMapper;
 import top.rrricardo.postcalendarbackend.mappers.GroupMapper;
 import top.rrricardo.postcalendarbackend.mappers.TimeSpanEventMapper;
 import top.rrricardo.postcalendarbackend.mappers.UserMapper;
@@ -24,6 +25,7 @@ import java.util.Map;
 public class TimeSpanEventController extends ControllerBase {
     private final UserMapper userMapper;
     private final GroupMapper groupMapper;
+    private final GroupLinkMapper groupLinkMapper;
     private final TimeSpanEventMapper eventMapper;
     private final TimeSpanEventService userTimeSpanEventService;
     private final TimeSpanEventService groupTimeSpanEventService;
@@ -31,9 +33,11 @@ public class TimeSpanEventController extends ControllerBase {
     public TimeSpanEventController(TimeSpanEventMapper eventMapper,
                                    UserMapper userMapper,
                                    GroupMapper groupMapper,
+                                   GroupLinkMapper groupLinkMapper,
                                    Map<String, TimeSpanEventService> serviceMap) {
         this.userMapper = userMapper;
         this.groupMapper = groupMapper;
+        this.groupLinkMapper = groupLinkMapper;
         this.eventMapper = eventMapper;
         this.userTimeSpanEventService = serviceMap.get("userTimeSpanEvent");
         this.groupTimeSpanEventService = serviceMap.get("groupTimeSpanEvent");
@@ -63,6 +67,16 @@ public class TimeSpanEventController extends ControllerBase {
 
         try {
             var result = userTimeSpanEventService.queryEvent(id, beginTime, endTime);
+            // 查询当前用户所属组织中的事件
+            var groupLinks = groupLinkMapper.getGroupLinksByUserId(id);
+
+            for (var groupLink : groupLinks) {
+                var eventsInGroup = groupTimeSpanEventService.queryEvent(groupLink.getGroupId(), beginTime, endTime);
+
+                for (var item : eventsInGroup) {
+                    result.add(item);
+                }
+            }
 
             return ok(result.toList());
         } catch (TimeSpanEventException e) {
