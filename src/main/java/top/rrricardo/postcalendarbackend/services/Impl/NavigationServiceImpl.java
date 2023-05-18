@@ -12,6 +12,7 @@ import top.rrricardo.postcalendarbackend.utils.generic.Heap;
 
 import java.util.Arrays;
 
+
 @Service
 public class NavigationServiceImpl implements NavigationService {
 
@@ -31,31 +32,7 @@ public class NavigationServiceImpl implements NavigationService {
         getMatrix();
     }
 
-    static class Node implements Comparable<Node>{
-        int id;
-        float distance;  //起点到这个点的距离
 
-        public Node(int id, float distance) {
-            this.id = id;
-            this.distance = distance;
-        }
-
-
-        @Override
-        public int compareTo(Node o) {
-            if(this.distance > o.distance){
-                return 1;
-            }
-            else if(this.distance < o.distance){
-                return -1;
-            }
-            else
-            {
-                return 0;
-            }
-        }
-
-    }
 
     /**
      * 得到邻接矩阵（同时得到地点id到matrix数组下标索引的映射）
@@ -99,6 +76,34 @@ public class NavigationServiceImpl implements NavigationService {
         Arrays.fill(visited, false);
         float [] distance = new float [MAX];  //节点到起点的距离
         String[] path = new String[MAX]; //保存最短路径
+
+        //辅助类
+        class Node implements Comparable<Node>{
+            int id;
+            float distance;  //起点到这个点的距离
+
+            public Node(int id, float distance) {
+                this.id = id;
+                this.distance = distance;
+            }
+
+
+            @Override
+            public int compareTo(Node o) {
+                if(this.distance > o.distance){
+                    return 1;
+                }
+                else if(this.distance < o.distance){
+                    return -1;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+
+        }
+
         Heap <Node> queue = new Heap<>();
 
         int start = map.get(Source);
@@ -159,11 +164,130 @@ public class NavigationServiceImpl implements NavigationService {
     }
 
 
-    //这部分还没写......
     @Override
-    public CustomList<Place> findPathManyDestination(int Source, CustomList<Integer> middlePoints){
-        return null;
+    public CustomList<Place> findPathManyDestination(CustomList<Integer> middlePoints){
+        //指定的多点映射到 0~n上
+        CustomHashTable <Integer, Integer> map2 = new CustomHashTable<>();
+        int j, i = 0;
+        for(var value: middlePoints){
+            map2.put(value, i);
+            i++;
+        }
+
+        int N = middlePoints.getSize();
+        float [][] matrix2 = new float[N][N];  //定义一个“小的”邻接矩阵，作为middlePoints之间的邻接矩阵
+        //用嵌套哈希表map3将matrix2与对应路径关联起来(注意map3里面只存了上三角)
+        CustomHashTable<Integer, CustomHashTable<Integer, CustomList<Place>>> map3 = new CustomHashTable<>();
+
+        //调用findPathOneDestination找到任意两个middlePoints之间的最短路径
+        for(i = 0; i < N - 1; i++){
+            matrix2[i][i] = 0.0f;
+            CustomHashTable<Integer, CustomList<Place>> temp1 = new CustomHashTable<>();
+            for(j = i + 1; j < N; j++){
+                CustomList<Place> temp = findPathOneDestination(middlePoints.get(i), middlePoints.get(j));
+                temp1.put(j, temp);
+                //计算temp中最短路径的长度
+                float sum = 0;
+                for(int k = 0; k + 1 < temp.getSize(); k++){
+                    sum = sum + matrix[map.get(temp.get(k).getId())][map.get(temp.get(k+1).getId())];
+                }
+                matrix2[i][j] = sum;
+                matrix2[j][i] = sum;
+            }
+
+            map3.put(i, temp1);
+        }
+
+        //辅助类（为了得到全排列）
+        class fullArrange {
+            static int N = 30;  //途径点的数量限定为不超过30
+            static int n;
+            static int[] pos = new int[N];
+            static boolean[] flag = new boolean[N];
+
+            static int count;
+
+            static CustomList<CustomList<Integer>> list = new CustomList<>();
+
+            public static void dfs(int u) {
+                if (u == n) {
+                    count++;
+                    CustomList<Integer> list1 = new CustomList<>();
+                    for (int i = 0; i < n; i++) {
+                        list1.add(pos[i]);
+                    }
+                    list.add(list1);
+
+                    return;
+                }
+
+                for (int j = 1; j <= n; j++) {
+                    if (!flag[j]) {
+                        pos[u] = j;
+                        flag[j] = true;
+                        dfs(u + 1);
+                        flag[j] = false;
+                    }
+                }
+            }
+        }
+
+        //获取1到n-1的全排列
+        fullArrange.n = N - 1;
+        fullArrange.dfs(0);
+        CustomList<CustomList<Integer>> list2 = fullArrange.list;
+
+        //按全排列遍历所有可能，找到距离最短的环路
+        CustomList<Integer> minList = list2.get(0);
+        float min = Float.MAX_VALUE;
+        for(var list3: list2){
+            float sum = matrix2[0][list3.get(1)];  //第一步必定是从起点开始走出去
+            i = 1;
+            while(i + 1 < list3.getSize()){
+                sum = sum + matrix2[list3.get(i)][list3.get(i+1)];
+                i++;
+
+                if(sum > min){
+                    break;
+                }
+            }
+
+            sum = sum + matrix2[i][0];  //最后一步必定是回到起点
+
+            //更新最短路径
+            if(sum < min){
+                minList = list3;
+                min = sum;
+            }
+        }
+
+        //根据得到的最短环路的索引的全排列，还原出整个路径
+        CustomList<Place> reList = map3.get(0).get(minList.get(0));
+        for(i = 0; i + 1 < minList.getSize(); i++){
+            CustomList <Place> tempList = new CustomList<>();
+            //因为map3只存了上三角，所以要判断一下
+            if(map3.get(i).get(i+1) == null){
+                tempList = map3.get(i+1).get(i);
+            }
+            else{
+
+                tempList = map3.get(i).get(i+1);
+            }
+
+            tempList.remove(0); //移除中间重复节点
+
+            //将tempList并入reList
+            for(var value: tempList){
+                reList.add(value);
+            }
+
+        }
+
+        return reList;
+
     }
+
+
 
     @Override
     public CustomList<Road> getRoadsByPlace(CustomList<Place> places) {
@@ -173,7 +297,6 @@ public class NavigationServiceImpl implements NavigationService {
         int startId = places.get(j).getId();
         int endId = places.get(j+1).getId();
 
-        outLoop:
         while(true){
 
             //遍历所有道路，找到以这两点为端点的道路

@@ -24,11 +24,10 @@ public interface NavigationService {
 
     /**
      * 寻找途径多点的最短路径
-     * @param Source 起点id
-     * @param middlePoints 需要途径的点集合
+     * @param middlePoints 需要途径的点列表(第一个为起点Source)
      * @return 途径多点的最短路径
      */
-    CustomList<Place> findPathManyDestination(int Source, CustomList<Integer> middlePoints);
+    CustomList<Place> findPathManyDestination(CustomList<Integer> middlePoints);
 
     //通过地点序列找到道路序列
     CustomList<Road> getRoadsByPlace(CustomList<Place> places);
