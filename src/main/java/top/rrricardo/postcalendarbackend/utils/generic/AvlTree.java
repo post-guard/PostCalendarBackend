@@ -44,23 +44,12 @@ public class AvlTree<T extends Comparable<? super T>> implements Iterable<T> {
     public CustomList<T> selectRange(T begin, T end) {
         var result = new CustomList<T>();
 
-        var iterator = iterator();
-
-        while (iterator.hasNext()) {
-            var data = iterator.next();
-
-            if (data.compareTo(begin) >= 0) {
+        for (T data : this) {
+            if (data.compareTo(begin) >= 0 && data.compareTo(end) <= 0) {
                 result.add(data);
-                break;
             }
-        }
 
-        while (iterator.hasNext()) {
-            var data = iterator.next();
-
-            if (data.compareTo(end) <= 0) {
-                result.add(data);
-            } else {
+            if (data.compareTo(end) > 0) {
                 break;
             }
         }
