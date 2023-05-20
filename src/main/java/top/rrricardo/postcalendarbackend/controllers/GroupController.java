@@ -11,6 +11,7 @@ import top.rrricardo.postcalendarbackend.mappers.GroupLinkMapper;
 import top.rrricardo.postcalendarbackend.mappers.GroupMapper;
 import top.rrricardo.postcalendarbackend.models.Group;
 import top.rrricardo.postcalendarbackend.models.GroupLink;
+import top.rrricardo.postcalendarbackend.utils.Common;
 import top.rrricardo.postcalendarbackend.utils.ControllerBase;
 import top.rrricardo.postcalendarbackend.components.AuthorizeInterceptor;
 import java.util.List;
@@ -55,9 +56,9 @@ public class GroupController extends ControllerBase {
 
         groupMapper.createGroup(group);
 
-        //创建好组织后，将创建者以管理员身份加入组织
+        //创建好组织后，将创建者以超级管理员身份加入组织
         UserDTO userDTO = AuthorizeInterceptor.getUserDTO();
-        var link = new GroupLink(userDTO.getId(), group.getId(), UserPermission.ADMIN);
+        var link = new GroupLink(userDTO.getId(), group.getId(), UserPermission.SUPER);
         groupLinkMapper.createGroupLink(link);
 
         return created(group);
@@ -99,7 +100,15 @@ public class GroupController extends ControllerBase {
             return notFound("组织不存在");
         }
 
+        if (id == Common.DefaultUsersGroupId) {
+            return badRequest("禁止删除默认组织");
+        }
+
         groupMapper.deleteGroup(id);
+        var groupLinks = groupLinkMapper.getGroupLinksByGroupId(id);
+        for (var groupLink : groupLinks) {
+            groupLinkMapper.deleteGroupLink(groupLink.getId());
+        }
 
         return noContent();
     }
