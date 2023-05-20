@@ -44,7 +44,7 @@ public class NavigationController extends ControllerBase {
         return ok(response);
     }
 
-    @GetMapping("/")
+    @PostMapping("/manyDestination")
     @Authorize(policy = AuthorizePolicy.ONLY_LOGIN)
     public ResponseEntity<ResponseDTO<NavigationDTO>> getNavigationMany(
             @RequestBody List<Integer> places
