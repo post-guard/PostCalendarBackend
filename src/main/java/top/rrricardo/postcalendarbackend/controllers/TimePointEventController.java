@@ -101,11 +101,6 @@ public class TimePointEventController extends ControllerBase {
             return notFound("用户不存在");
         }
 
-        var oldEvent = eventMapper.getEventById(event.getId());
-        if (oldEvent == null) {
-            return notFound("事件不存在");
-        }
-
         try {
             userTimePointEventService.addEvent(event);
 
@@ -125,6 +120,11 @@ public class TimePointEventController extends ControllerBase {
 
         if (user == null) {
             return notFound("用户不存在");
+        }
+
+        var oldEvent = eventMapper.getEventById(event.getId());
+        if (oldEvent == null) {
+            return notFound("事件不存在");
         }
 
         try {

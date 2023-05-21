@@ -99,11 +99,6 @@ public class TimeSpanEventController extends ControllerBase {
             return notFound("用户不存在");
         }
 
-        var oldEvent = eventMapper.getEventById(event.getId());
-        if (oldEvent == null) {
-            return notFound("事件不存在");
-        }
-
         try {
             userTimeSpanEventService.addEvent(event);
 
@@ -123,6 +118,11 @@ public class TimeSpanEventController extends ControllerBase {
 
         if (user == null) {
             return notFound("用户不存在");
+        }
+
+        var oldEvent = eventMapper.getEventById(event.getId());
+        if (oldEvent == null) {
+            return notFound("事件不存在");
         }
 
         try {
