@@ -53,6 +53,18 @@ create table if not exists `time_span_events` (
     primary key (`id`)
 );
 
+create table if not exists `time_point_events` (
+    `id` int not null auto_increment,
+    `name` text not null ,
+    `details` text not null ,
+    `endDateTime` DATETIME not null ,
+    `placeId` int  not null ,
+    `userId` int,
+    `groupId` int,
+    `type` int not null ,
+    primary key (`id`)
+);
+
 
 
 

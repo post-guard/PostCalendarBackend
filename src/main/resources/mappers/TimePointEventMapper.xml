@@ -1,0 +1,40 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.rrricardo.postcalendarbackend.mappers.TimePointEventMapper">
+    <select id="getEvents" resultType="TimePointEvent">
+        select * from `time_point_events`
+    </select>
+
+    <select id="getEventById" parameterType="int" resultType="TimePointEvent">
+        select * from `time_point_events` where `id` = #{id}
+    </select>
+
+    <insert id="createEvent" parameterType="TimePointEvent" useGeneratedKeys="true" keyProperty="id">
+        insert into `time_point_events` (id, name, details, endDateTime, placeId, userId, groupId, type)
+        values  (
+                 #{id},
+                 #{name},
+                 #{details},
+                 #{endDateTime},
+                 #{placeId},
+                 #{userId},
+                 #{groupId},
+                 #{type}
+                )
+    </insert>
+
+    <update id="updateEvent" parameterType="TimePointEvent">
+        update `time_point_events`
+        set `name`=#{name},
+            `details`=#{details},
+            `endDateTime`=#{endDateTime},
+            `placeId`=#{placeId},
+            `userId`=#{userId},
+            `groupId`=#{groupId},
+            `type`=#{type}
+        where `id`=#{id}
+    </update>
+
+    <delete id="deleteEvent" parameterType="int">
+        delete from `time_point_events` where `id` = #{id}
+    </delete>
+</mapper>
