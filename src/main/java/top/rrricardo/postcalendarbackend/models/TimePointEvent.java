@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 /**
  * 时间点事件
  */
-public class TimePointEvent {
+public class TimePointEvent implements Comparable<TimePointEvent> {
     private int id;
     /**
      * 事件名称
@@ -87,5 +87,48 @@ public class TimePointEvent {
 
     public int getGroupId() {
         return groupId;
+    }
+
+    @Override
+    public int compareTo(TimePointEvent event) {
+        return this.endDateTime.compareTo(event.endDateTime);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (obj == null) {
+            return false;
+        }
+
+        if (obj instanceof TimePointEvent event) {
+            return name.equals(event.name)
+                    && details.equals(event.details)
+                    && endDateTime.equals(event.endDateTime)
+                    && (userId == event.userId || groupId == event.groupId)
+                    && placeId == event.placeId
+                    && type == event.type;
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        var builder = new StringBuilder();
+
+        builder.append("事件名称：").append(name).append('\n');
+        builder.append("事件详情：").append(details).append('\n');
+        builder.append("事件发生地点ID：").append(placeId).append('\n');
+        if (userId != 0 && groupId == 0) {
+            builder.append("用户ID：").append(userId).append('\n');
+        } else if (userId == 0 && groupId != 0) {
+            builder.append("组织ID：").append(groupId).append('\n');
+        }
+        builder.append("事件类型：").append(type).append('\n');
+
+        return builder.toString();
     }
 }
