@@ -209,10 +209,6 @@ public class TimeSpanEventController extends ControllerBase {
             return notFound("请求的组织不存在");
         }
 
-        var oldEvent = eventMapper.getEventById(event.getId());
-        if (oldEvent == null) {
-            return notFound("事件不存在");
-        }
 
         try {
             groupTimeSpanEventService.addEvent(event);
@@ -232,6 +228,11 @@ public class TimeSpanEventController extends ControllerBase {
         var group = groupMapper.getGroupById(id);
         if (group == null) {
             return notFound("请求的组织不存在");
+        }
+
+        var oldEvent = eventMapper.getEventById(event.getId());
+        if (oldEvent == null) {
+            return notFound("事件不存在");
         }
 
         try {
