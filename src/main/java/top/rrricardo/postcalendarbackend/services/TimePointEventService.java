@@ -14,13 +14,14 @@ import java.time.LocalDateTime;
  * 时间点事件服务
  */
 public abstract class TimePointEventService {
-    public abstract void addEvent(TimePointEvent event);
+    public abstract void addEvent(TimePointEvent event) throws TimePointEventException;
 
-    public abstract void removeEvent(TimePointEvent event);
+    public abstract void removeEvent(TimePointEvent event) throws TimePointEventException;
 
-    public  abstract void updateEvent(TimePointEvent event);
+    public  abstract void updateEvent(TimePointEvent event) throws TimePointEventException;
 
-    public abstract CustomList<TimePointEvent> queryEvent(int id, LocalDateTime begin, LocalDateTime end);
+    public abstract CustomList<TimePointEvent> queryEvent(int id, LocalDateTime begin, LocalDateTime end)
+            throws TimePointEventException;
 
     /**
      * 添加事件辅助函数
