@@ -268,7 +268,7 @@ public class TimePointEventController extends ControllerBase {
         }
 
         try {
-            groupTimePointEventService.updateEvent(event);
+            groupTimePointEventService.removeEvent(event);
             return noContent();
         } catch (TimePointEventException e) {
             return badRequest(e.getMessage());

@@ -266,7 +266,7 @@ public class TimeSpanEventController extends ControllerBase {
         }
 
         try {
-            groupTimeSpanEventService.updateEvent(event);
+            groupTimeSpanEventService.removeEvent(event);
             return noContent();
         } catch (TimeSpanEventException e) {
             return badRequest(e.getMessage());
