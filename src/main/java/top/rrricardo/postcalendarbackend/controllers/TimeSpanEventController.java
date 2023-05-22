@@ -99,6 +99,20 @@ public class TimeSpanEventController extends ControllerBase {
             return notFound("用户不存在");
         }
 
+        // 判断事件是否冲突
+        if (!userTimeSpanEventService.judgeConflict(id, event)) {
+            return badRequest("同用户中的事件发生冲突");
+        }
+
+        var groupLinks = groupLinkMapper.getGroupLinksByUserId(id);
+
+        for (var groupLink : groupLinks) {
+            // 检查是否同用户所在组织的事件冲突
+            if (!groupTimeSpanEventService.judgeConflict(groupLink.getGroupId(), event)) {
+                return badRequest("同所在组织：" + groupLink.getGroupId() + "的事件冲突");
+            }
+        }
+
         try {
             userTimeSpanEventService.addEvent(event);
 
@@ -209,6 +223,18 @@ public class TimeSpanEventController extends ControllerBase {
             return notFound("请求的组织不存在");
         }
 
+        // 判断冲突
+        if (!groupTimeSpanEventService.judgeConflict(id, event)) {
+            return badRequest("同组织中的事件发生冲突");
+        }
+
+        var groupLinks = groupLinkMapper.getGroupLinksByGroupId(id);
+
+        for (var groupLink : groupLinks) {
+            if (!userTimeSpanEventService.judgeConflict(groupLink.getUserId(), event)) {
+                return badRequest("同组织中用户：" + groupLink.getUserId() + "的事件发生冲突");
+            }
+        }
 
         try {
             groupTimeSpanEventService.addEvent(event);

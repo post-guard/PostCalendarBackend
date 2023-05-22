@@ -41,11 +41,14 @@ public abstract class TimeSpanEventService {
      */
     public abstract CustomList<TimeSpanEvent> queryEvent(int id, LocalDateTime begin, LocalDateTime end) throws TimeSpanEventException;
 
+    public abstract boolean judgeConflict(int id, TimeSpanEvent event);
+
     /**
      * 添加事件辅助函数
-     * @param event 需要添加的时间
+     *
+     * @param event  需要添加的时间
      * @param forest 需要添加的森林
-     * @param id 欲添加的属主ID
+     * @param id     欲添加的属主ID
      */
     protected void addEventHelper(TimeSpanEvent event, CustomHashTable<Integer, AvlTree<TimeSpanEvent>> forest, int id)
             throws TimeSpanEventException {
@@ -68,9 +71,10 @@ public abstract class TimeSpanEventService {
 
     /**
      * 删除事件辅助函数
-     * @param event 需要删除的事件
+     *
+     * @param event  需要删除的事件
      * @param forest 需要删除的森林
-     * @param id 属主ID
+     * @param id     属主ID
      */
     protected void removeEventHelper(TimeSpanEvent event, CustomHashTable<Integer, AvlTree<TimeSpanEvent>> forest,
                                      int id) throws TimeSpanEventException {
@@ -85,9 +89,10 @@ public abstract class TimeSpanEventService {
 
     /**
      * 修改事件辅助函数
-     * @param event 需要修改的事件
+     *
+     * @param event  需要修改的事件
      * @param forest 需要修改的森林
-     * @param id 属主ID
+     * @param id     属主ID
      */
     protected void updateEventHelper(TimeSpanEvent event, CustomHashTable<Integer, AvlTree<TimeSpanEvent>> forest,
                                      int id) throws TimeSpanEventException {
@@ -111,7 +116,7 @@ public abstract class TimeSpanEventService {
         }
 
         if (oldEvent.getBeginDateTime().equals(event.getBeginDateTime())
-        && oldEvent.getEndDateTime().equals(event.getEndDateTime())) {
+                && oldEvent.getEndDateTime().equals(event.getEndDateTime())) {
             // 不修改事件的开始和结束时间
             // 直接修改原来的二叉树
             oldEvent.setName(event.getName());
@@ -131,10 +136,11 @@ public abstract class TimeSpanEventService {
 
     /**
      * 查询事件辅助函数
+     *
      * @param forest 查询的森林
-     * @param id 属主ID
-     * @param begin 开始时间
-     * @param end 结束时间
+     * @param id     属主ID
+     * @param begin  开始时间
+     * @param end    结束时间
      * @return 在时间段内的事件列表
      * @throws TimeSpanEventException 查询不存在的用户/组织引发的错误
      */
@@ -158,5 +164,51 @@ public abstract class TimeSpanEventService {
         return tree.selectRange(beginTimeObj, endTimeObj);
     }
 
+    protected boolean judgeConflictHelper(TimeSpanEvent event, AvlTree<TimeSpanEvent> tree) {
+        var iterator = tree.iterator();
 
+        TimeSpanEvent left;
+        TimeSpanEvent right = null;
+
+        if (iterator.hasNext()) {
+            left = iterator.next();
+        } else {
+            // 在树中不存在元素
+            return true;
+        }
+
+        if (iterator.hasNext()) {
+            right = iterator.next();
+        }
+
+        if (event.compareTo(left) <= 0) {
+            // 事件在树中事件的前面
+            return event.getEndDateTime().isBefore(left.getBeginDateTime());
+        }
+
+        while (iterator.hasNext()) {
+            if (left.compareTo(event) <= 0 && event.compareTo(right) <= 0) {
+                // 找到位于中间的状态
+                return left.getEndDateTime().isBefore(event.getBeginDateTime())
+                        && event.getEndDateTime().isBefore(right.getBeginDateTime());
+            }
+
+            left = right;
+            right = iterator.next();
+        }
+
+        // 最后两个元素
+        // 当然还有还要考虑树中只有一个元素的情况
+        if (right != null) {
+            if (left.compareTo(event) <= 0 && event.compareTo(right) <= 0) {
+                // 找到位于中间的状态
+                return left.getEndDateTime().isBefore(event.getBeginDateTime())
+                        && event.getEndDateTime().isBefore(right.getBeginDateTime());
+            } else {
+                return right.getEndDateTime().isBefore(event.getBeginDateTime());
+            }
+        } else {
+            return left.getEndDateTime().isBefore(event.getBeginDateTime());
+        }
+    }
 }

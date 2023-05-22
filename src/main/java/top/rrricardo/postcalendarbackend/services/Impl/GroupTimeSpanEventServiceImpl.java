@@ -61,6 +61,17 @@ public class GroupTimeSpanEventServiceImpl extends TimeSpanEventService {
         return queryEventHelper(groupEventForest, id, begin, end);
     }
 
+    @Override
+    public boolean judgeConflict(int id, TimeSpanEvent event) {
+        var tree = groupEventForest.get(id);
+
+        if (tree == null) {
+            return false;
+        }
+
+        return judgeConflictHelper(event, tree);
+    }
+
     private void readDataFromDatabase() {
         groupEventForest.clear();
 
