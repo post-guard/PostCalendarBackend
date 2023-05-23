@@ -186,7 +186,7 @@ public class TimeSpanEventServiceImpl implements TimeSpanEventService {
         oldEvent = tree.find(oldEvent);
 
         if (oldEvent.getBeginDateTime().equals(event.getBeginDateTime()) &&
-        oldEvent.getEndDateTime().equals(event.getEndDateTime())) {
+                oldEvent.getEndDateTime().equals(event.getEndDateTime())) {
             // 没有改变开始和结束时间
             // 直接修改树上的对象
             oldEvent.setName(event.getName());
@@ -197,6 +197,11 @@ public class TimeSpanEventServiceImpl implements TimeSpanEventService {
             tree.remove(oldEvent);
 
             if (judgeConflictHelper(event, tree)) {
+                try {
+                    tree.insert(oldEvent);
+                } catch (AvlNodeRepeatException e) {
+                    throw new TimeSpanEventException("发生冲突");
+                }
                 throw new TimeSpanEventException("同组织内的事件发生冲突");
             }
 
@@ -207,6 +212,11 @@ public class TimeSpanEventServiceImpl implements TimeSpanEventService {
 
                 if (userTree != null) {
                     if (judgeConflictHelper(event, userTree)) {
+                        try {
+                            tree.insert(oldEvent);
+                        } catch (AvlNodeRepeatException e) {
+                            throw new TimeSpanEventException("发生冲突");
+                        }
                         throw new TimeSpanEventException("同组织内成员的事件发生冲突");
                     }
                 }
@@ -299,7 +309,7 @@ public class TimeSpanEventServiceImpl implements TimeSpanEventService {
             }
         }
     }
-    
+
     /**
      * 添加事件辅助函数
      *
@@ -337,7 +347,7 @@ public class TimeSpanEventServiceImpl implements TimeSpanEventService {
      * @param id     属主ID
      */
     private void removeEventHelper(TimeSpanEvent event, CustomHashTable<Integer, AvlTree<TimeSpanEvent>> forest,
-                                     int id) throws TimeSpanEventException {
+                                   int id) throws TimeSpanEventException {
         var oldEvent = eventMapper.getEventById(event.getId());
 
         if (oldEvent == null) {
@@ -369,7 +379,7 @@ public class TimeSpanEventServiceImpl implements TimeSpanEventService {
      * @throws TimeSpanEventException 查询不存在的用户/组织引发的错误
      */
     private CustomList<TimeSpanEvent> queryEventHelper(CustomHashTable<Integer, AvlTree<TimeSpanEvent>> forest,
-                                                         int id, LocalDateTime begin, LocalDateTime end)
+                                                       int id, LocalDateTime begin, LocalDateTime end)
             throws TimeSpanEventException {
         var tree = forest.get(id);
 
@@ -390,8 +400,9 @@ public class TimeSpanEventServiceImpl implements TimeSpanEventService {
 
     /**
      * 判断是否发生冲突的辅助函数
+     *
      * @param event 需要判断的事件
-     * @param tree 需要判断的树
+     * @param tree  需要判断的树
      * @return 为真为发生冲突，反之没有发生冲突
      */
     private boolean judgeConflictHelper(TimeSpanEvent event, AvlTree<TimeSpanEvent> tree) {
