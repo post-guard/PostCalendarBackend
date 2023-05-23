@@ -41,6 +41,15 @@ public class AvlTree<T extends Comparable<? super T>> implements Iterable<T> {
         remove(root, data);
     }
 
+    /**
+     * 在树上查找指定的元素
+     * @param target 需要查找的元素
+     * @return 找到的元素，如果为空说明未找到
+     */
+    public T find(T target) {
+        return find(target, root);
+    }
+
     public CustomList<T> selectRange(T begin, T end) {
         var result = new CustomList<T>();
 
@@ -191,6 +200,30 @@ public class AvlTree<T extends Comparable<? super T>> implements Iterable<T> {
         }
 
         balanceTree(node);
+    }
+
+    /**
+     * 在树上查找指定的元素
+     * @param target 需要查找的元素
+     * @param tree 需要查找的树
+     * @return 查找的结果，如果为null则为未找到
+     */
+    private T find(T target, AvlTreeNode<T> tree) {
+        if (tree == null) {
+            return null;
+        }
+
+        var result = target.compareTo(tree.data);
+
+        if (result < 0) {
+            return find(target, tree.leftNode);
+        }
+
+        if (result > 0) {
+            return find(target, tree.rightNode);
+        }
+
+        return target.equals(tree.data) ? tree.data : null;
     }
 
     /**

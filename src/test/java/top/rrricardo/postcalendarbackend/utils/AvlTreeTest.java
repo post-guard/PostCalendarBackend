@@ -19,6 +19,7 @@ public class AvlTreeTest {
         tree.insert(1);
         var actual = tree.toString();
         Assertions.assertEquals("1 ", actual);
+        Assertions.assertEquals(1, tree.find(1));
     }
 
     @Test
@@ -34,6 +35,7 @@ public class AvlTreeTest {
         var actual = tree.toString();
         var expect = "1 2 3 4 5 ";
         Assertions.assertEquals(expect, actual);
+        Assertions.assertEquals(5, tree.find(5));
     }
 
     @Test
@@ -49,6 +51,7 @@ public class AvlTreeTest {
         var actual = tree.toString();
         var expect = "1 2 3 4 5 ";
         Assertions.assertEquals(expect, actual);
+        Assertions.assertEquals(5, tree.find(5));
     }
 
     @Test
