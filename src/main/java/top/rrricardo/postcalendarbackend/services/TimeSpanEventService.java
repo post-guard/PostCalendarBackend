@@ -53,6 +53,24 @@ public interface TimeSpanEventService {
     void updateGroupEvent(TimeSpanEvent event) throws TimeSpanEventException;
 
     /**
+     * 判断指定用户的这一时间段是否空闲
+     * @param beginTime 开始时间
+     * @param endTime 结束时间
+     * @param userId 指定用户ID
+     * @throws TimeSpanEventException 如果不空闲引发的异常
+     */
+    void judgeUserTimeConflict(LocalDateTime beginTime, LocalDateTime endTime, int userId) throws TimeSpanEventException;
+
+    /**
+     * 判断指定组织的这一时间段是否空闲
+     * @param beginTime 开始时间
+     * @param endTime 结束时间
+     * @param groupId 指定组织ID
+     * @throws TimeSpanEventException 如果不空闲引发的异常
+     */
+    void judgeGroupTimeConflict(LocalDateTime beginTime, LocalDateTime endTime, int groupId) throws TimeSpanEventException;
+
+    /**
      * 获得指定用户在指定时间范围的事件
      *
      * @param id    ID

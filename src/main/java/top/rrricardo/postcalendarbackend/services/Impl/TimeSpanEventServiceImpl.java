@@ -48,44 +48,19 @@ public class TimeSpanEventServiceImpl implements TimeSpanEventService {
     public void addUserEvent(TimeSpanEvent event) throws TimeSpanEventException {
         var userId = event.getUserId();
 
-        var user = userMapper.getUserById(userId);
-        if (user == null) {
-            throw new TimeSpanEventException("欲添加事件的目标用户不存在");
-        }
-
-        var tree = userEventForest.get(userId);
-        if (tree != null) {
-            if (judgeConflictHelper(event, tree)) {
-                throw new TimeSpanEventException("同用户的事件发生冲突");
-            }
-        }
-
-        var groupLinks = groupLinkMapper.getGroupLinksByUserId(userId);
-        for (var groupLink : groupLinks) {
-            tree = groupEventForest.get(groupLink.getGroupId());
-
-            if (tree != null) {
-                if (judgeConflictHelper(event, tree)) {
-                    throw new TimeSpanEventException("同用户所在组织的事件发生冲突");
-                }
-            }
-        }
+        // 判断冲突
+        judgeUserTimeConflict(event.getBeginDateTime(), event.getEndDateTime(), userId);
 
         addEventHelper(event, userEventForest, userId);
-        eventMapper.createEvent(event);
     }
 
     @Override
     public void addGroupEvent(TimeSpanEvent event) throws TimeSpanEventException {
         var groupId = event.getGroupId();
 
-        var group = groupMapper.getGroupById(groupId);
-        if (group == null) {
-            throw new TimeSpanEventException("欲添加事件的组织不存在");
-        }
+        judgeGroupTimeConflict(event.getBeginDateTime(), event.getEndDateTime(), groupId);
 
         addEventHelper(event, groupEventForest, groupId);
-        eventMapper.createEvent(event);
     }
 
     @Override
@@ -249,6 +224,49 @@ public class TimeSpanEventServiceImpl implements TimeSpanEventService {
     @Override
     public CustomList<TimeSpanEvent> queryGroupEvent(int id, LocalDateTime begin, LocalDateTime end) throws TimeSpanEventException {
         return queryEventHelper(groupEventForest, id, begin, end);
+    }
+
+    @Override
+    public void judgeUserTimeConflict(LocalDateTime beginTime, LocalDateTime endTime, int userId) throws TimeSpanEventException {
+        var tree = userEventForest.get(userId);
+        var user = userMapper.getUserById(userId);
+
+        // 森林中不存在树不意味着不存在该用户
+        // 可能是应用启动之后才新建的用户
+        if (user == null) {
+            throw new TimeSpanEventException("指定的用户不存在");
+        }
+
+        if (tree == null) {
+            return;
+        }
+
+        var event = new TimeSpanEvent();
+        event.setBeginDateTime(beginTime);
+        event.setEndDateTime(endTime);
+
+        judgeUserConflictHelper(event, userId, tree);
+    }
+
+    @Override
+    public void judgeGroupTimeConflict(LocalDateTime beginTime, LocalDateTime endTime, int groupId) throws TimeSpanEventException {
+        var tree = groupEventForest.get(groupId);
+        var group = groupMapper.getGroupById(groupId);
+
+        // 对于组织也存在着同样的道理
+        if (group == null) {
+            throw new TimeSpanEventException("指定的组织不存在");
+        }
+
+        if (tree == null) {
+            return;
+        }
+
+        var event = new TimeSpanEvent();
+        event.setBeginDateTime(beginTime);
+        event.setEndDateTime(endTime);
+
+        judgeGroupConflictHelper(event, groupId, tree);
     }
 
     private void readDataFromDatabase() {
@@ -450,6 +468,54 @@ public class TimeSpanEventServiceImpl implements TimeSpanEventService {
             }
         } else {
             return !left.getEndDateTime().isBefore(event.getBeginDateTime());
+        }
+    }
+
+    /**
+     * 判断给指定用户添加事件是否发生冲突的辅助函数
+     * @param event 需要添加的事件
+     * @param userId 添加事件的用户
+     * @param tree 即将添加的树
+     * @throws TimeSpanEventException 如果发生冲突引发的异常
+     */
+    private void judgeUserConflictHelper(TimeSpanEvent event, int userId, AvlTree<TimeSpanEvent> tree)
+        throws TimeSpanEventException {
+        if (judgeConflictHelper(event, tree)) {
+            throw new TimeSpanEventException("同用户的事件发生冲突");
+        }
+
+        var groupLinks = groupLinkMapper.getGroupLinksByUserId(userId);
+
+        for (var groupLink : groupLinks) {
+            var groupTree = groupEventForest.get(groupLink.getGroupId());
+
+            if (judgeConflictHelper(event, groupTree)) {
+                throw new TimeSpanEventException("同用户所在组织的事件发生冲突");
+            }
+        }
+    }
+
+    /**
+     * 判断给指定组织添加事件是否发生冲突的辅助函数
+     * @param event 需要添加的事件
+     * @param groupId 添加事件的用户
+     * @param tree 即将添加的树
+     * @throws TimeSpanEventException 如果发生冲突引发的异常
+     */
+    private void judgeGroupConflictHelper(TimeSpanEvent event, int groupId, AvlTree<TimeSpanEvent> tree)
+        throws TimeSpanEventException {
+        if (judgeConflictHelper(event, tree)) {
+            throw new TimeSpanEventException("同组织内的事件发生冲突");
+        }
+
+        var groupLinks = groupLinkMapper.getGroupLinksByGroupId(groupId);
+
+        for (var groupLink : groupLinks) {
+            var groupTree = groupEventForest.get(groupLink);
+
+            if (judgeConflictHelper(event, groupTree)) {
+                throw new TimeSpanEventException("同组织中用户的事件发生冲突");
+            }
         }
     }
 }
