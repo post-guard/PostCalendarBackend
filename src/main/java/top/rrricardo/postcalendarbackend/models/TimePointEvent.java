@@ -105,7 +105,8 @@ public class TimePointEvent implements Comparable<TimePointEvent> {
         }
 
         if (obj instanceof TimePointEvent event) {
-            return name.equals(event.name)
+            return id == event.id
+                    && name.equals(event.name)
                     && details.equals(event.details)
                     && endDateTime.equals(event.endDateTime)
                     && (userId == event.userId || groupId == event.groupId)

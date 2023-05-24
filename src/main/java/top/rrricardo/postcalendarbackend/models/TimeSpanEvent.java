@@ -113,7 +113,8 @@ public class TimeSpanEvent implements Comparable<TimeSpanEvent> {
         }
 
         if (obj instanceof TimeSpanEvent event) {
-            return name.equals(event.name)
+            return id == event.id
+                    && name.equals(event.name)
                     && details.equals(event.details)
                     && (userId == event.userId || groupId == event.groupId)
                     && placeId == event.placeId
