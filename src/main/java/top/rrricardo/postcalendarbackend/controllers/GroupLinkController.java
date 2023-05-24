@@ -11,7 +11,7 @@ import top.rrricardo.postcalendarbackend.mappers.GroupLinkMapper;
 import top.rrricardo.postcalendarbackend.mappers.GroupMapper;
 import top.rrricardo.postcalendarbackend.mappers.UserMapper;
 import top.rrricardo.postcalendarbackend.models.GroupLink;
-import top.rrricardo.postcalendarbackend.utils.Common;
+import top.rrricardo.postcalendarbackend.commons.Common;
 import top.rrricardo.postcalendarbackend.utils.ControllerBase;
 
 import java.util.List;

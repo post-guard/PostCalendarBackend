@@ -8,7 +8,7 @@ import top.rrricardo.postcalendarbackend.enums.UserPermission;
 import top.rrricardo.postcalendarbackend.exceptions.NoIdInPathException;
 import top.rrricardo.postcalendarbackend.mappers.GroupLinkMapper;
 import top.rrricardo.postcalendarbackend.services.AuthorizeService;
-import top.rrricardo.postcalendarbackend.utils.Common;
+import top.rrricardo.postcalendarbackend.commons.Common;
 
 @Service("currentUser")
 public class CurrentUserAuthorizeService implements AuthorizeService {

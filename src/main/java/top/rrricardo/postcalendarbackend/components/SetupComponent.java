@@ -13,7 +13,7 @@ import top.rrricardo.postcalendarbackend.models.Group;
 import top.rrricardo.postcalendarbackend.models.GroupLink;
 import top.rrricardo.postcalendarbackend.models.User;
 import top.rrricardo.postcalendarbackend.services.UserService;
-import top.rrricardo.postcalendarbackend.utils.Common;
+import top.rrricardo.postcalendarbackend.commons.Common;
 
 @Component
 public class SetupComponent implements CommandLineRunner {

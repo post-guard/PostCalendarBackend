@@ -8,7 +8,7 @@ import top.rrricardo.postcalendarbackend.mappers.UserMapper;
 import top.rrricardo.postcalendarbackend.models.GroupLink;
 import top.rrricardo.postcalendarbackend.models.User;
 import top.rrricardo.postcalendarbackend.services.UserService;
-import top.rrricardo.postcalendarbackend.utils.Common;
+import top.rrricardo.postcalendarbackend.commons.Common;
 import top.rrricardo.postcalendarbackend.utils.EncryptSha256Util;
 
 
