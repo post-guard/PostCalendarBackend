@@ -155,6 +155,9 @@ public class TimePointEventServiceImpl implements TimePointEventService {
 
                     addEvent2TreeHelper(tree, event);
                 }
+
+                eventMapper.updateEvent(event);
+                return;
             }
         }
 
@@ -206,6 +209,9 @@ public class TimePointEventServiceImpl implements TimePointEventService {
 
                     addEvent2TreeHelper(tree, event);
                 }
+
+                eventMapper.updateEvent(event);
+                return;
             }
         }
 

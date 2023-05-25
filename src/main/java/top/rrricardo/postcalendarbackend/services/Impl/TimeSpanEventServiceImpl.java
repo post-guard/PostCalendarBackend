@@ -508,14 +508,20 @@ public class TimeSpanEventServiceImpl implements TimeSpanEventService {
             throw new TimeSpanEventException("同组织内的事件发生冲突");
         }
 
-        var groupLinks = groupLinkMapper.getGroupLinksByGroupId(groupId);
+        // 我们想了一下 认为判断组织内事件是否发生冲突不用考虑组织内的用户
+        // 例如308组织下午要军训，不能因为308有个哥们需要恰麦当劳而爆炸
+        /*var groupLinks = groupLinkMapper.getGroupLinksByGroupId(groupId);
 
         for (var groupLink : groupLinks) {
-            var groupTree = groupEventForest.get(groupLink);
+            var groupTree = groupEventForest.get(groupLink.getUserId());
+
+            if (groupTree == null) {
+                continue;
+            }
 
             if (judgeConflictHelper(event, groupTree)) {
                 throw new TimeSpanEventException("同组织中用户的事件发生冲突");
             }
-        }
+        }*/
     }
 }

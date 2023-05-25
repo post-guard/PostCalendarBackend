@@ -223,7 +223,7 @@ public class AvlTree<T extends Comparable<? super T>> implements Iterable<T> {
             return find(target, tree.rightNode);
         }
 
-        return target.equals(tree.data) ? tree.data : null;
+        return tree.data;
     }
 
     /**
