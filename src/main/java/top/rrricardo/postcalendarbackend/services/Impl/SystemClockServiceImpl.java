@@ -27,9 +27,14 @@ public class SystemClockServiceImpl implements SystemClockService, DisposableBea
 
     @Override
     public void speedDown(int time) {
-        var result = ClockTask.time * time;
+        var result = ClockTask.time / time;
 
         ClockTask.time = Math.max(result, 1);
+    }
+
+    @Override
+    public void setNow(LocalDateTime dateTime) {
+        ClockTask.now = dateTime;
     }
 
     @Override

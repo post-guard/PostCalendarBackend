@@ -27,6 +27,8 @@ public interface SystemClockService {
      */
     void speedDown(int time);
 
+    void setNow(LocalDateTime dateTime);
+
     /**
      * 启动时间服务
      */

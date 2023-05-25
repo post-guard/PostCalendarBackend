@@ -7,8 +7,6 @@ import top.rrricardo.postcalendarbackend.dtos.SystemTimeDTO;
 import top.rrricardo.postcalendarbackend.services.SystemClockService;
 import top.rrricardo.postcalendarbackend.utils.ControllerBase;
 
-import java.time.LocalDateTime;
-
 @RestController
 @RequestMapping("/clock")
 public class SystemClockController extends ControllerBase {
@@ -19,8 +17,12 @@ public class SystemClockController extends ControllerBase {
     }
 
     @GetMapping("/")
-    public ResponseEntity<ResponseDTO<LocalDateTime>> getSystemTime() {
-        return ok(systemClockService.getNow());
+    public ResponseEntity<ResponseDTO<SystemTimeDTO>> getSystemTime() {
+        var result = new SystemTimeDTO();
+        result.setTime(systemClockService.getTime());
+        result.setNow(systemClockService.getNow());
+
+        return ok(result);
     }
 
     @PostMapping("/speedUp")
@@ -31,7 +33,8 @@ public class SystemClockController extends ControllerBase {
 
         systemClockService.speedUp(timeDTO.getTime());
         var result = new SystemTimeDTO();
-        result.setTime(timeDTO.getTime());
+        result.setTime(systemClockService.getTime());
+        result.setNow(systemClockService.getNow());
 
         return ok(result);
     }
@@ -44,7 +47,19 @@ public class SystemClockController extends ControllerBase {
 
         systemClockService.speedDown(timeDTO.getTime());
         var result = new SystemTimeDTO();
-        result.setTime(timeDTO.getTime());
+        result.setTime(systemClockService.getTime());
+        result.setNow(systemClockService.getNow());
+
+        return ok(result);
+    }
+
+    @PostMapping("/update")
+    public ResponseEntity<ResponseDTO<SystemTimeDTO>> setDateTime(@RequestBody SystemTimeDTO timeDTO) {
+        systemClockService.setNow(timeDTO.getNow());
+
+        var result = new SystemTimeDTO();
+        result.setNow(systemClockService.getNow());
+        result.setTime(systemClockService.getTime());
 
         return ok(result);
     }
