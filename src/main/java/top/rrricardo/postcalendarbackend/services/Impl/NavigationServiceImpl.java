@@ -75,7 +75,7 @@ public class NavigationServiceImpl implements NavigationService {
         boolean [] visited= new boolean [MAX]; //标记节点是否已找到最短路径
         Arrays.fill(visited, false);
         float [] distance = new float [MAX];  //节点到起点的距离
-        String[] path = new String[MAX]; //保存最短路径
+        CustomHashTable<Integer, CustomList<Integer>> path1 = new CustomHashTable<>(); //保存源点到每个点的最短路径
 
         //辅助类
         class Node implements Comparable<Node>{
@@ -114,7 +114,10 @@ public class NavigationServiceImpl implements NavigationService {
         int i;
         for(i = 0; i < MAX; i++){
 
-            path[i] = start + "-" + i;
+            CustomList<Integer> list = new CustomList<>();
+            list.add(start);
+            list.add(i);
+            path1.put(i, list);
             if(i == start)
             {
                 continue;
@@ -143,7 +146,10 @@ public class NavigationServiceImpl implements NavigationService {
                     //更新节点信息
                     if(distance[node.id] + matrix[node.id][j] < distance[j]){
                         distance[j] = distance[node.id] + matrix[node.id][j];
-                        path[j] = path[node.id] + "-" + j;
+                        CustomList<Integer> tempList = path1.get(node.id);
+                        tempList.add(j);
+                        path1.remove(j);
+                        path1.put(j, tempList);
                         queue.add(new Node(j, distance[j]));
                     }
                 }
@@ -151,16 +157,13 @@ public class NavigationServiceImpl implements NavigationService {
         }
 
 
-        //得到的路径是字符串形式，需要处理
-        CustomList <Place> list = new CustomList<>();
-        String str = String.valueOf(path[end]);
-        String [] array = str.split("-");
-        for(i = 0; i < array.length; i++){
-            list.add(allPlaces.get(Integer.parseInt(array[i])));
+        CustomList <Place> reList = new CustomList<>();
+        for(var value: path1.get(end)){
+            reList.add(allPlaces.get(value));
         }
 
 
-        return list;
+        return reList;
     }
 
 
