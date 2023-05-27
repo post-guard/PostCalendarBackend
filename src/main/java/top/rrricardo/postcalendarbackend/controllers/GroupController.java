@@ -1,5 +1,7 @@
 package top.rrricardo.postcalendarbackend.controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import top.rrricardo.postcalendarbackend.annotations.Authorize;
@@ -23,11 +25,11 @@ public class GroupController extends ControllerBase {
 
     private final GroupMapper groupMapper;
     private final GroupLinkMapper groupLinkMapper;
-
-
+    private final Logger logger;
     public GroupController(GroupMapper groupMapper, GroupLinkMapper groupLinkMapper) {
         this.groupMapper = groupMapper;
         this.groupLinkMapper = groupLinkMapper;
+        this.logger = LoggerFactory.getLogger(GroupController.class);
     }
 
     @GetMapping("/")
@@ -35,6 +37,7 @@ public class GroupController extends ControllerBase {
     public ResponseEntity<ResponseDTO<List<Group>>> getGroups(){
         var groups = groupMapper.getGroups();
 
+        logger.info("成功获取全部组织列表");
         return ok(groups);
     }
 
@@ -44,9 +47,11 @@ public class GroupController extends ControllerBase {
         var group = groupMapper.getGroupById(id);
 
         if (group == null) {
+            logger.info("获取组织失败，不存在id={}的组织", id);
             return notFound("组织不存在");
         }
 
+        logger.info("获取组织成功，组织id={}", id);
         return ok(group);
     }
 
@@ -61,6 +66,7 @@ public class GroupController extends ControllerBase {
         var link = new GroupLink(userDTO.getId(), group.getId(), UserPermission.SUPER);
         groupLinkMapper.createGroupLink(link);
 
+        logger.info("创建组织成功，组织id={}", group.getId());
         return created(group);
     }
 
@@ -70,12 +76,14 @@ public class GroupController extends ControllerBase {
             (@PathVariable (value = "id") int id, @RequestBody Group group) throws NullPointerException{
 
         if (id != group.getId()) {
+            logger.info("更新组织信息失败，id不一致");
             return badRequest();
         }
 
         var oldGroup = groupMapper.getGroupById(id);
         if(oldGroup == null){
             //组织不存在
+            logger.info("更新组织信息失败，不存在id={}的组织", id);
             return notFound("组织不存在");
         }
 
@@ -87,6 +95,7 @@ public class GroupController extends ControllerBase {
             throw new NullPointerException();
         }
 
+        logger.info("更新组织信息成功，组织id={}", id);
         return ok(group);
     }
 
@@ -97,10 +106,12 @@ public class GroupController extends ControllerBase {
         var group = groupMapper.getGroupById(id);
 
         if (group == null) {
+            logger.info("删除组织失败，不存在id={}的组织", id);
             return notFound("组织不存在");
         }
 
         if (id == Common.DefaultUsersGroupId) {
+            logger.info("删除失败，禁止删除默认组织");
             return badRequest("禁止删除默认组织");
         }
 
@@ -110,6 +121,7 @@ public class GroupController extends ControllerBase {
             groupLinkMapper.deleteGroupLink(groupLink.getId());
         }
 
+        logger.info("删除成功，被删除的组织id={}", id);
         return noContent();
     }
 }
