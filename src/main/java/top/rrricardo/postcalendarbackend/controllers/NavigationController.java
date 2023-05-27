@@ -1,5 +1,7 @@
 package top.rrricardo.postcalendarbackend.controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import top.rrricardo.postcalendarbackend.annotations.Authorize;
@@ -18,10 +20,11 @@ import java.util.List;
 public class NavigationController extends ControllerBase {
     private final NavigationService navigationService;
     private final PlaceMapper placeMapper;
-
+    private final Logger logger;
     public NavigationController(NavigationService navigationService, PlaceMapper placeMapper) {
         this.navigationService = navigationService;
         this.placeMapper = placeMapper;
+        this.logger = LoggerFactory.getLogger(NavigationController.class);
     }
 
     @GetMapping("/oneDestination")
@@ -34,6 +37,7 @@ public class NavigationController extends ControllerBase {
         var endPlace = placeMapper.getPlaceById(endPlaceId);
 
         if (startPlace == null || endPlace == null) {
+            logger.info("获取导航失败，请求的地点不存在");
             return badRequest("请求的地点不存在");
         }
 
@@ -41,6 +45,8 @@ public class NavigationController extends ControllerBase {
         var roadList = navigationService.getRoadsByPlace(placeList);
 
         var response = new NavigationDTO(placeList.toList(), roadList.toList());
+
+        logger.info("获取导航成功");
         return ok(response);
     }
 
@@ -50,6 +56,7 @@ public class NavigationController extends ControllerBase {
             @RequestBody List<Integer> places
     ) {
         if (places.size() <= 2) {
+            logger.info("获取多点导航失败，请求的地点数过少");
             return badRequest("请求的地点数过少");
         }
 
@@ -58,6 +65,7 @@ public class NavigationController extends ControllerBase {
 
         var response = new NavigationDTO(placeList.toList(), roadList.toList());
 
+        logger.info("成功获取多点导航");
         return ok(response);
     }
 }
