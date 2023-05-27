@@ -1,5 +1,7 @@
 package top.rrricardo.postcalendarbackend.controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import top.rrricardo.postcalendarbackend.annotations.Authorize;
@@ -18,11 +20,12 @@ public class RoadController extends ControllerBase {
 
     private final RoadMapper roadMapper;
     private final NavigationService navigationService;
-
+    private final Logger logger;
 
     public RoadController(RoadMapper roadMapper, NavigationService navigationService) {
         this.roadMapper = roadMapper;
         this.navigationService = navigationService;
+        this.logger = LoggerFactory.getLogger(RoadController.class);
     }
 
     @GetMapping("/")
@@ -30,6 +33,7 @@ public class RoadController extends ControllerBase {
     public ResponseEntity<ResponseDTO<List<Road>>> getRoads(){
         var roads = roadMapper.getRoads();
 
+        logger.info("获取所有道路成功");
         return ok(roads);
     }
 
@@ -39,9 +43,11 @@ public class RoadController extends ControllerBase {
         var road = roadMapper.getRoadById(id);
 
         if (road == null) {
+            logger.info("获取道路失败，不存在id={}的道路",id);
             return notFound("道路不存在");
         }
 
+        logger.info("获取道路成功，id={}",id);
         return ok(road);
     }
 
@@ -52,6 +58,7 @@ public class RoadController extends ControllerBase {
         roadMapper.createRoad(road);
         navigationService.setMapUpdated();
 
+        logger.info("创建道路成功,id={}", road.getId());
         return created(road);
     }
 
@@ -61,12 +68,14 @@ public class RoadController extends ControllerBase {
             (@PathVariable (value = "id") int id, @RequestBody Road road) throws NullPointerException{
 
         if (id != road.getId()) {
+            logger.info("更新道路失败，id不一致");
             return badRequest();
         }
 
         var oldRoad = roadMapper.getRoadById(id);
         if(oldRoad == null){
             //道路不存在
+            logger.info("更新道路失败，id={}的道路不存在", id);
             return notFound("道路不存在");
         }
 
@@ -79,6 +88,7 @@ public class RoadController extends ControllerBase {
             throw new NullPointerException();
         }
 
+        logger.info("更新道路成功，id={}",id);
         return ok(newRoad);
     }
 
@@ -89,12 +99,14 @@ public class RoadController extends ControllerBase {
         var road = roadMapper.getRoadById(id);
 
         if (road == null) {
+            logger.info("删除道路失败，不存在id={}的道路", id);
             return notFound("道路不存在");
         }
 
         roadMapper.deleteRoad(id);
         navigationService.setMapUpdated();
 
+        logger.info("删除道路成功，id={}", id);
         return noContent();
     }
 
