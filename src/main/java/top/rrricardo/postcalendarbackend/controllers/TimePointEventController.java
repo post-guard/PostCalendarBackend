@@ -54,7 +54,7 @@ public class TimePointEventController extends ControllerBase {
             logger.info("成功获取id={}的用户的时间点事件", id);
             return ok(result.toList());
         } catch (TimePointEventException e) {
-            logger.info("获取id={}的用户的时间点事件失败", id);
+            logger.error("获取id={}的用户的时间点事件失败 ", id, e);
             return badRequest(e.getMessage());
         }
     }
@@ -76,7 +76,7 @@ public class TimePointEventController extends ControllerBase {
             logger.info("给id={}的用户创建时间点事件成功", id);
             return created(event);
         } catch (TimePointEventException e) {
-            logger.info("给id={}的用户创建时间点时间失败", id);
+            logger.error("给id={}的用户创建时间点时间失败 ", id, e);
             return badRequest(e.getMessage());
         }
     }
@@ -98,7 +98,7 @@ public class TimePointEventController extends ControllerBase {
             logger.info("修改时间点事件成功");
             return ok(event);
         } catch (TimePointEventException e) {
-            logger.info("修改时间点事件失败");
+            logger.error("修改时间点事件失败 ", e);
             return badRequest(e.getMessage());
         }
     }
@@ -119,7 +119,7 @@ public class TimePointEventController extends ControllerBase {
             logger.info("删除用户时间点事件成功");
             return noContent();
         } catch (TimePointEventException e) {
-            logger.info("删除用户时间点事件失败");
+            logger.error("删除用户时间点事件失败 ", e);
             return badRequest(e.getMessage());
         }
     }
@@ -147,7 +147,7 @@ public class TimePointEventController extends ControllerBase {
             logger.info("成功获取id={}的组织的时间点事件", id);
             return ok(result.toList());
         } catch (TimePointEventException e) {
-            logger.info("获取组织时间点事件失败");
+            logger.error("获取组织时间点事件失败 ", e);
             return badRequest(e.getMessage());
         }
     }
@@ -169,7 +169,7 @@ public class TimePointEventController extends ControllerBase {
             logger.info("给id={}的组织创建时间点事件成功", id);
             return created(event);
         } catch (TimePointEventException e) {
-            logger.info("给id={}的组织创建时间点事件失败", id);
+            logger.error("给id={}的组织创建时间点事件失败 ", id, e);
             return badRequest(e.getMessage());
         }
     }
@@ -191,7 +191,7 @@ public class TimePointEventController extends ControllerBase {
             logger.info("修改指定组织的时间点事件成功");
             return ok(event);
         } catch (TimePointEventException e) {
-            logger.info("修改指定组织的时间点事件失败");
+            logger.error("修改指定组织的时间点事件失败 ", e);
             return badRequest(e.getMessage());
         }
     }
@@ -212,7 +212,7 @@ public class TimePointEventController extends ControllerBase {
             logger.info("删除指定组织的时间点事件成功");
             return noContent();
         } catch (TimePointEventException e) {
-            logger.info("删除指定组织的时间点事件失败");
+            logger.error("删除指定组织的时间点事件失败 ", e);
             return badRequest(e.getMessage());
         }
     }
