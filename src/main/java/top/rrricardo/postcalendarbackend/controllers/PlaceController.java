@@ -1,5 +1,7 @@
 package top.rrricardo.postcalendarbackend.controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import top.rrricardo.postcalendarbackend.annotations.Authorize;
@@ -18,10 +20,11 @@ public class PlaceController extends ControllerBase {
 
     private final PlaceMapper placeMapper;
     private final NavigationService navigationService;
-
+    private final Logger logger;
     public PlaceController(PlaceMapper placeMapper, NavigationService navigationService) {
         this.placeMapper = placeMapper;
         this.navigationService = navigationService;
+        this.logger = LoggerFactory.getLogger(PlaceController.class);
     }
 
     @GetMapping("/")
@@ -29,6 +32,7 @@ public class PlaceController extends ControllerBase {
     public ResponseEntity<ResponseDTO<List<Place>>> getPlaces(){
         var places = placeMapper.getPlaces();
 
+        logger.info("获取地点列表成功");
         return ok(places);
     }
     @GetMapping("/{id}")
@@ -37,9 +41,11 @@ public class PlaceController extends ControllerBase {
         var place = placeMapper.getPlaceById(id);
 
         if (place == null) {
+            logger.info("获取地点失败，id={}的地点不存在", id);
             return notFound("地点不存在");
         }
 
+        logger.info("获取地点成功，id={}",id);
         return ok(place);
     }
 
@@ -51,6 +57,7 @@ public class PlaceController extends ControllerBase {
         placeMapper.createPlace(place);
         navigationService.setMapUpdated();
 
+        logger.info("创建地点成功");
         return created(place);
     }
 
@@ -60,12 +67,14 @@ public class PlaceController extends ControllerBase {
             (@PathVariable (value = "id") int id, @RequestBody Place place) throws NullPointerException{
 
         if (id != place.getId()) {
+            logger.info("更新地点失败, id不一致");
             return badRequest();
         }
 
         var oldPlace = placeMapper.getPlaceById(id);
         if(oldPlace == null){
             //地点不存在
+            logger.info("更新地点失败，id={}的地点不存在", id);
             return notFound("地点不存在");
         }
 
@@ -78,6 +87,7 @@ public class PlaceController extends ControllerBase {
             throw new NullPointerException();
         }
 
+        logger.info("更新地点成功, 地点id={}", id);
         return ok(newPlace);
     }
 
@@ -88,12 +98,14 @@ public class PlaceController extends ControllerBase {
         var place = placeMapper.getPlaceById(id);
 
         if (place == null) {
+            logger.info("删除失败，id={}的地点不存在", id);
             return notFound("地点不存在");
         }
 
         placeMapper.deletePlace(id);
         navigationService.setMapUpdated();
 
+        logger.info("删除地点成功,id={}", id);
         return noContent();
     }
 }
