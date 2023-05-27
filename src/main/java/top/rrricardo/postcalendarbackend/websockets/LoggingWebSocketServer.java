@@ -10,7 +10,7 @@ import top.rrricardo.postcalendarbackend.commons.LoggingQueue;
 
 
 @Service
-@ServerEndpoint("/logging")
+@ServerEndpoint("/websocket/logging")
 public class LoggingWebSocketServer implements DisposableBean {
     private final Logger logger;
     private boolean running = true;

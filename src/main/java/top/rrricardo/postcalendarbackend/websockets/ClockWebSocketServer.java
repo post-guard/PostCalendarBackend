@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 
 @Service
-@ServerEndpoint("/clock")
+@ServerEndpoint("/websocket/clock")
 public class ClockWebSocketServer {
     private static Session session = null;
     private final Logger logger;
