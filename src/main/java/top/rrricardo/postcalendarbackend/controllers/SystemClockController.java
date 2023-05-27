@@ -1,5 +1,7 @@
 package top.rrricardo.postcalendarbackend.controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import top.rrricardo.postcalendarbackend.dtos.ResponseDTO;
@@ -11,14 +13,16 @@ import top.rrricardo.postcalendarbackend.utils.ControllerBase;
 @RequestMapping("/clockControl")
 public class SystemClockController extends ControllerBase {
     private final SystemClockService systemClockService;
-
+    private final Logger logger;
     public SystemClockController(SystemClockService systemClockService) {
         this.systemClockService = systemClockService;
+        this.logger = LoggerFactory.getLogger(SystemClockController.class);
     }
 
     @PostMapping("/speedUp")
     public ResponseEntity<ResponseDTO<SystemTimeDTO>> setSpeedUp(@RequestBody SystemTimeDTO timeDTO) {
         if (timeDTO.getTime() < 1) {
+            logger.info("时间加速失败，放大的倍数必须大于等于1");
             return badRequest("放大的倍数必须大于或者等于1");
         }
 
@@ -27,13 +31,15 @@ public class SystemClockController extends ControllerBase {
         result.setTime(systemClockService.getTime());
         result.setNow(systemClockService.getNow());
 
+        logger.info("时间加速成功");
         return ok(result);
     }
 
     @PostMapping("/speedDown")
     public ResponseEntity<ResponseDTO<SystemTimeDTO>> setSpeedDown(@RequestBody SystemTimeDTO timeDTO) {
         if (timeDTO.getTime() < 1) {
-            return badRequest("放大的倍数必须大于或者等于1");
+            logger.info("时间减速失败，缩小的倍数必须大于等于1");
+            return badRequest("缩小的倍数必须大于或者等于1");
         }
 
         systemClockService.speedDown(timeDTO.getTime());
@@ -41,6 +47,7 @@ public class SystemClockController extends ControllerBase {
         result.setTime(systemClockService.getTime());
         result.setNow(systemClockService.getNow());
 
+        logger.info("时间减速成功");
         return ok(result);
     }
 
@@ -52,6 +59,7 @@ public class SystemClockController extends ControllerBase {
         result.setNow(systemClockService.getNow());
         result.setTime(systemClockService.getTime());
 
+        logger.info("设置时间成功");
         return ok(result);
     }
 }
