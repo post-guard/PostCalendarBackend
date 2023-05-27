@@ -51,7 +51,7 @@ public class TimeSpanEventController extends ControllerBase {
             logger.info("成功获取id={}的用户的时间段事件", id);
             return ok(result.toList());
         } catch (TimeSpanEventException e) {
-            logger.info("获取id={}的用户的时间段事件失败", id);
+            logger.error("获取id={}的用户的时间段事件失败 ", id, e);
             return badRequest(e.getMessage());
         }
     }
@@ -72,7 +72,7 @@ public class TimeSpanEventController extends ControllerBase {
             logger.info("给id={}的用户创建时间段事件成功", id);
             return created(event);
         } catch (TimeSpanEventException e) {
-            logger.info("给id={}的用户创建时间段时间失败", id);
+            logger.error("给id={}的用户创建时间段时间失败 ", id, e);
             return badRequest(e.getMessage());
         }
     }
@@ -94,7 +94,7 @@ public class TimeSpanEventController extends ControllerBase {
             logger.info("成功修改id={}的用户的时间段事件", id);
             return ok(event);
         } catch (TimeSpanEventException e) {
-            logger.info("修改时间段事件失败");
+            logger.error("修改时间段事件失败 ", e);
             return badRequest(e.getMessage());
         }
     }
@@ -115,7 +115,7 @@ public class TimeSpanEventController extends ControllerBase {
             logger.info("删除指定用户的时间段事件成功");
             return noContent();
         } catch (TimeSpanEventException e) {
-            logger.info("删除指定用户的时间段事件失败");
+            logger.error("删除指定用户的时间段事件失败 ", e);
             return badRequest(e.getMessage());
         }
     }
@@ -144,7 +144,7 @@ public class TimeSpanEventController extends ControllerBase {
             logger.info("成功获取id={}的组织的时间段事件", id);
             return ok(result.toList());
         } catch (TimeSpanEventException e) {
-            logger.info("获取组织时间段事件失败");
+            logger.error("获取组织时间段事件失败 ", e);
             return badRequest(e.getMessage());
         }
     }
@@ -165,7 +165,7 @@ public class TimeSpanEventController extends ControllerBase {
             logger.info("给id={}的组织创建时间段事件成功", id);
             return created(event);
         } catch (TimeSpanEventException e) {
-            logger.info("给id={}的组织创建时间段事件失败", id);
+            logger.error("给id={}的组织创建时间段事件失败 ", id, e);
             return badRequest(e.getMessage());
         }
     }
@@ -186,7 +186,7 @@ public class TimeSpanEventController extends ControllerBase {
             logger.info("修改指定组织的时间段事件成功");
             return ok(event);
         } catch (TimeSpanEventException e) {
-            logger.info("修改指定组织的时间段事件失败");
+            logger.error("修改指定组织的时间段事件失败 ", e);
             return badRequest(e.getMessage());
         }
     }
@@ -207,7 +207,7 @@ public class TimeSpanEventController extends ControllerBase {
             logger.info("删除指定组织的时间段事件成功");
             return noContent();
         } catch (TimeSpanEventException e) {
-            logger.info("删除指定组织的时间段事件失败");
+            logger.error("删除指定组织的时间段事件失败 ", e);
             return badRequest(e.getMessage());
         }
     }
