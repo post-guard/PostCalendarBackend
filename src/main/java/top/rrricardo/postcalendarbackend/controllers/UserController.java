@@ -1,5 +1,7 @@
 package top.rrricardo.postcalendarbackend.controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import top.rrricardo.postcalendarbackend.annotations.Authorize;
@@ -16,9 +18,10 @@ import java.util.List;
 @RequestMapping("/user")
 public class UserController extends ControllerBase {
     private final UserMapper userMapper;
-
+    private final Logger logger;
     public UserController(UserMapper userMapper) {
         this.userMapper = userMapper;
+        this.logger = LoggerFactory.getLogger(UserController.class);
     }
 
     @GetMapping("/")
@@ -26,6 +29,7 @@ public class UserController extends ControllerBase {
     public ResponseEntity<ResponseDTO<List<UserDTO>>> getUsers() {
         var users = userMapper.getUsers();
 
+        logger.info("成功获取所有用户列表");
         return ok(UserDTO.arrayOf(users));
     }
 
@@ -35,9 +39,11 @@ public class UserController extends ControllerBase {
         var user = userMapper.getUserById(id);
 
         if (user == null) {
+            logger.info("获取用户失败，不存在id={}的用户", id);
             return notFound("用户不存在");
         }
 
+        logger.info("成功获取id={}的用户", id);
         return ok(new UserDTO(user));
     }
 
@@ -46,12 +52,14 @@ public class UserController extends ControllerBase {
     public ResponseEntity<ResponseDTO<UserDTO>> update(@PathVariable(value = "id") int id,
                                        @RequestBody User user) throws NullPointerException {
         if (id != user.getId()) {
+            logger.info("更新指定用户信息失败，用户ID和更新信息中的ID不一致");
             return badRequest();
         }
 
         var oldUser = userMapper.getUserById(id);
         if (oldUser == null) {
             // 用户不存在
+            logger.info("更新指定用户信息失败，不存在id={}的用户", id);
             return notFound("用户不存在");
         }
 
@@ -63,6 +71,7 @@ public class UserController extends ControllerBase {
             throw new NullPointerException();
         }
 
+        logger.info("成功更新id={}的用户信息", id);
         return ok(new UserDTO(newUser));
     }
 
@@ -72,11 +81,13 @@ public class UserController extends ControllerBase {
         var user = userMapper.getUserById(id);
 
         if (user == null) {
+            logger.info("删除指定用户失败，不存在id={}的用户", id);
             return notFound("用户不存在");
         }
 
         userMapper.deleteUser(id);
 
+        logger.info("成功删除id={}的用户", id);
         return noContent();
     }
 }
