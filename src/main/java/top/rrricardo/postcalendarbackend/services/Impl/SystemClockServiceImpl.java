@@ -1,14 +1,23 @@
 package top.rrricardo.postcalendarbackend.services.Impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.stereotype.Service;
 import top.rrricardo.postcalendarbackend.services.SystemClockService;
+import top.rrricardo.postcalendarbackend.websockets.ClockWebSocketServer;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 
 @Service
 public class SystemClockServiceImpl implements SystemClockService, DisposableBean {
     private static boolean running = false;
+    private final Logger logger;
+
+    public SystemClockServiceImpl() {
+        logger = LoggerFactory.getLogger(getClass());
+    }
 
     @Override
     public LocalDateTime getNow() {
@@ -43,6 +52,22 @@ public class SystemClockServiceImpl implements SystemClockService, DisposableBea
 
         var thread = new Thread(new ClockTask());
         thread.start();
+
+        var websocketThread = new Thread(() -> {
+            while (running) {
+                try {
+                    ClockWebSocketServer.sendClock(getNow());
+                } catch (IOException e) {
+                    logger.warn("时钟推送服务错误", e);
+                }
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+        websocketThread.start();
     }
 
     @Override

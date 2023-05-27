@@ -8,21 +8,12 @@ import top.rrricardo.postcalendarbackend.services.SystemClockService;
 import top.rrricardo.postcalendarbackend.utils.ControllerBase;
 
 @RestController
-@RequestMapping("/clock")
+@RequestMapping("/clockControl")
 public class SystemClockController extends ControllerBase {
     private final SystemClockService systemClockService;
 
     public SystemClockController(SystemClockService systemClockService) {
         this.systemClockService = systemClockService;
-    }
-
-    @GetMapping("/")
-    public ResponseEntity<ResponseDTO<SystemTimeDTO>> getSystemTime() {
-        var result = new SystemTimeDTO();
-        result.setTime(systemClockService.getTime());
-        result.setNow(systemClockService.getNow());
-
-        return ok(result);
     }
 
     @PostMapping("/speedUp")
