@@ -146,10 +146,15 @@ public class NavigationServiceImpl implements NavigationService {
                     //更新节点信息
                     if(distance[node.id] + matrix[node.id][j] < distance[j]){
                         distance[j] = distance[node.id] + matrix[node.id][j];
-                        CustomList<Integer> tempList = path1.get(node.id);
+                        CustomList<Integer> tempList = new CustomList<>();
+                        for(var value: path1.get(node.id)){
+                            tempList.add(value);
+                        }
                         tempList.add(j);
+
                         path1.remove(j);
                         path1.put(j, tempList);
+
                         queue.add(new Node(j, distance[j]));
                     }
                 }

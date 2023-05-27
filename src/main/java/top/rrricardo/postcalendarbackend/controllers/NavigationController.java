@@ -60,6 +60,14 @@ public class NavigationController extends ControllerBase {
             return badRequest("请求的地点数过少");
         }
 
+        //检查传入的所有途径地点是否都存在
+        for(var value: places){
+            if(placeMapper.getPlaceById(value) == null){
+                logger.info("获取多点导航失败，部分请求地点id不存在");
+                return badRequest("部分请求地点不存在");
+            }
+        }
+
         var placeList = navigationService.findPathManyDestination(new CustomList<>(places));
         var roadList = navigationService.getRoadsByPlace(placeList);
 
