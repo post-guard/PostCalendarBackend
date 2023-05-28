@@ -111,24 +111,21 @@ public class CustomListTest {
 
     @Test
     void testSort1() {
-        CustomList<Integer> expect = new CustomList<>();
+        var expect = new ArrayList<Integer>();
+        var actual = new CustomList<Integer>();
         Random random = new Random();
 
         for(int i = 0; i < 100; i++){
-            expect.add(random.nextInt(1000));
+            var input = random.nextInt();
+            expect.add(input);
+            actual.add(input);
         }
 
-        CustomList<Integer> list = new CustomList<>();
-        for(var value: expect){
-            list.add(value);
+        actual.sort(Comparator.naturalOrder());
+        expect.sort(Comparator.naturalOrder());
+
+        for (var i = 0; i < 100; i++) {
+            Assertions.assertEquals(expect.get(i), actual.get(i));
         }
-
-        list.sort(Comparator.naturalOrder());
-
-        for(int i = 0; i < 100; i++){
-            System.out.print(list.get(i) + " ");
-        }
-        System.out.println();
-
     }
 }
