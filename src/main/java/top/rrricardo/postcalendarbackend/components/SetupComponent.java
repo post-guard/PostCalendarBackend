@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import top.rrricardo.postcalendarbackend.commons.Common;
 import top.rrricardo.postcalendarbackend.enums.UserPermission;
 import top.rrricardo.postcalendarbackend.mappers.GroupLinkMapper;
 import top.rrricardo.postcalendarbackend.mappers.GroupMapper;
@@ -12,9 +13,9 @@ import top.rrricardo.postcalendarbackend.mappers.UserMapper;
 import top.rrricardo.postcalendarbackend.models.Group;
 import top.rrricardo.postcalendarbackend.models.GroupLink;
 import top.rrricardo.postcalendarbackend.models.User;
+import top.rrricardo.postcalendarbackend.services.SystemAlarmService;
 import top.rrricardo.postcalendarbackend.services.SystemClockService;
 import top.rrricardo.postcalendarbackend.services.UserService;
-import top.rrricardo.postcalendarbackend.commons.Common;
 
 @Component
 public class SetupComponent implements CommandLineRunner {
@@ -24,6 +25,7 @@ public class SetupComponent implements CommandLineRunner {
     private final GroupMapper groupMapper;
     private final GroupLinkMapper groupLinkMapper;
     private final SystemClockService systemClockService;
+    private final SystemAlarmService systemAlarmService;
     private final Logger logger;
 
     @Value("${user.rootUserEmailAddress}")
@@ -45,12 +47,14 @@ public class SetupComponent implements CommandLineRunner {
                           UserService userService,
                           GroupMapper groupMapper,
                           GroupLinkMapper groupLinkMapper,
-                          SystemClockService systemClockService) {
+                          SystemClockService systemClockService,
+                          SystemAlarmService systemAlarmService) {
         this.userMapper = userMapper;
         this.userService = userService;
         this.groupMapper = groupMapper;
         this.groupLinkMapper = groupLinkMapper;
         this.systemClockService = systemClockService;
+        this.systemAlarmService = systemAlarmService;
         logger = LoggerFactory.getLogger(SetupComponent.class);
     }
 
@@ -99,5 +103,7 @@ public class SetupComponent implements CommandLineRunner {
         } else {
             logger.info("Root exists.");
         }
+
+        systemAlarmService.start();
     }
 }
