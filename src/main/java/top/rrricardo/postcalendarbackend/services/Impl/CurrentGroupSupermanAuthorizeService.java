@@ -28,6 +28,7 @@ public class CurrentGroupSupermanAuthorizeService implements AuthorizeService {
             var link = groupLinkMapper.getGroupLinkByUserIdAndGroupId(user.getId(), id);
 
             if (link == null) {
+                logger.info("授权失败，组织中不存在该用户");
                 return false;
             } else {
                 return link.getPermissionEnum().getCode() >= UserPermission.SUPER.getCode();
