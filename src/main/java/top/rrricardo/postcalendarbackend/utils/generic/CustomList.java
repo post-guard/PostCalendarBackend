@@ -290,4 +290,57 @@ public class CustomList<E> implements Iterable<E>  {
 
         return Arrays.copyOf(elements, newCapacity);
     }
+
+    /**
+     * 自实现的排序算法
+     * @param comparator 比较器
+     */
+    @SuppressWarnings("unchecked")
+    public void sort(Comparator<E> comparator){
+        //调用自实现的快排算法
+        quickSort((E[])elements, 0, getSize() - 1, comparator);
+    }
+
+    //自实现的快排算法
+    public void quickSort(E [] array, int lowIndex, int highIndex, Comparator<E> comparator){
+        if (lowIndex >= highIndex) {
+            return;
+        }
+
+        int i = lowIndex;
+        int j = highIndex;
+
+        //总是选择最左侧的元素为轴
+        E key = array[lowIndex];
+
+        while (true) {
+            while (i < j) {
+                if (comparator.compare(array[j], key) < 0) {
+                    array[i] = array[j];
+                    break;
+                }
+                j--;
+            }
+
+            while (i < j) {
+                if (comparator.compare(array[i], key) > 0) {
+                    array[j] = array[i];
+                    break;
+                }
+                i++;
+            }
+
+            if (i == j) {
+                array[j] = key;
+                //分别对轴的左侧和右侧进行快排
+                quickSort(array, lowIndex, j - 1, comparator);
+                quickSort(array, j + 1, highIndex, comparator);
+
+                return;
+            }
+        }
+    }
+
+
+
 }

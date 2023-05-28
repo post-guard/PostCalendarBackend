@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import top.rrricardo.postcalendarbackend.utils.generic.CustomList;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Random;
 
 public class CustomListTest {
@@ -106,5 +107,28 @@ public class CustomListTest {
         for (var i = 0; i < 100; i++) {
             Assertions.assertEquals(actual.get(i), expect.get(i));
         }
+    }
+
+    @Test
+    void testSort1() {
+        CustomList<Integer> expect = new CustomList<>();
+        Random random = new Random();
+
+        for(int i = 0; i < 100; i++){
+            expect.add(random.nextInt(1000));
+        }
+
+        CustomList<Integer> list = new CustomList<>();
+        for(var value: expect){
+            list.add(value);
+        }
+
+        list.sort(Comparator.naturalOrder());
+
+        for(int i = 0; i < 100; i++){
+            System.out.print(list.get(i) + " ");
+        }
+        System.out.println();
+
     }
 }
