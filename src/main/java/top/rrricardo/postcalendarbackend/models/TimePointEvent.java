@@ -129,6 +129,7 @@ public class TimePointEvent implements Comparable<TimePointEvent> {
             builder.append("组织ID：").append(groupId).append('\n');
         }
         builder.append("事件类型：").append(type).append('\n');
+        builder.append("事件发生时间：").append(endDateTime).append('\n');
 
         return builder.toString();
     }
