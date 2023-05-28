@@ -9,6 +9,7 @@ import top.rrricardo.postcalendarbackend.dtos.ResponseDTO;
 import top.rrricardo.postcalendarbackend.enums.AuthorizePolicy;
 import top.rrricardo.postcalendarbackend.exceptions.TimePointEventException;
 import top.rrricardo.postcalendarbackend.models.TimePointEvent;
+import top.rrricardo.postcalendarbackend.services.SystemAlarmService;
 import top.rrricardo.postcalendarbackend.services.TimePointEventService;
 import top.rrricardo.postcalendarbackend.utils.ControllerBase;
 
@@ -21,11 +22,14 @@ import java.util.List;
 @RequestMapping("timePointEvent")
 public class TimePointEventController extends ControllerBase {
     private final TimePointEventService timePointEventService;
+    private final SystemAlarmService systemAlarmService;
     private final Logger logger;
     public TimePointEventController(
-            TimePointEventService timePointEventService
+            TimePointEventService timePointEventService,
+            SystemAlarmService systemAlarmService
     ) {
         this.timePointEventService = timePointEventService;
+        this.systemAlarmService = systemAlarmService;
         this.logger = LoggerFactory.getLogger(TimePointEventController.class);
     }
 
@@ -74,6 +78,7 @@ public class TimePointEventController extends ControllerBase {
             timePointEventService.addUserEvent(event);
 
             logger.info("给id={}的用户创建时间点事件成功", id);
+            systemAlarmService.refreshAlarms();
             return created(event);
         } catch (TimePointEventException e) {
             logger.error("给id={}的用户创建时间点时间失败 ", id, e);
@@ -96,6 +101,7 @@ public class TimePointEventController extends ControllerBase {
             timePointEventService.updateUserEvent(event);
 
             logger.info("修改时间点事件成功");
+            systemAlarmService.refreshAlarms();
             return ok(event);
         } catch (TimePointEventException e) {
             logger.error("修改时间点事件失败 ", e);
@@ -116,6 +122,7 @@ public class TimePointEventController extends ControllerBase {
 
         try {
             timePointEventService.removeUserEvent(event);
+            systemAlarmService.refreshAlarms();
             logger.info("删除用户时间点事件成功");
             return noContent();
         } catch (TimePointEventException e) {
@@ -167,6 +174,7 @@ public class TimePointEventController extends ControllerBase {
             timePointEventService.addGroupEvent(event);
 
             logger.info("给id={}的组织创建时间点事件成功", id);
+            systemAlarmService.refreshAlarms();
             return created(event);
         } catch (TimePointEventException e) {
             logger.error("给id={}的组织创建时间点事件失败 ", id, e);
@@ -189,6 +197,7 @@ public class TimePointEventController extends ControllerBase {
             timePointEventService.updateGroupEvent(event);
 
             logger.info("修改指定组织的时间点事件成功");
+            systemAlarmService.refreshAlarms();
             return ok(event);
         } catch (TimePointEventException e) {
             logger.error("修改指定组织的时间点事件失败 ", e);
@@ -210,6 +219,7 @@ public class TimePointEventController extends ControllerBase {
         try {
             timePointEventService.removeGroupEvent(event);
             logger.info("删除指定组织的时间点事件成功");
+            systemAlarmService.refreshAlarms();
             return noContent();
         } catch (TimePointEventException e) {
             logger.error("删除指定组织的时间点事件失败 ", e);

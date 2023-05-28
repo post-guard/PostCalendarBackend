@@ -96,7 +96,7 @@ public class SystemAlarmServiceImpl implements SystemAlarmService, DisposableBea
                         }
                     }
 
-                    Thread.sleep(100000);
+                    Thread.sleep(10000);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }

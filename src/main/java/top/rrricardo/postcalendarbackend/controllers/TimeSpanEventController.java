@@ -9,6 +9,7 @@ import top.rrricardo.postcalendarbackend.dtos.ResponseDTO;
 import top.rrricardo.postcalendarbackend.enums.AuthorizePolicy;
 import top.rrricardo.postcalendarbackend.exceptions.TimeSpanEventException;
 import top.rrricardo.postcalendarbackend.models.TimeSpanEvent;
+import top.rrricardo.postcalendarbackend.services.SystemAlarmService;
 import top.rrricardo.postcalendarbackend.services.TimeSpanEventService;
 import top.rrricardo.postcalendarbackend.utils.ControllerBase;
 
@@ -21,9 +22,12 @@ import java.util.List;
 @RequestMapping("/timeSpanEvent")
 public class TimeSpanEventController extends ControllerBase {
     private final TimeSpanEventService timeSpanEventService;
+    private final SystemAlarmService systemAlarmService;
     private final Logger logger;
-    public TimeSpanEventController(TimeSpanEventService timeSpanEventService) {
+    public TimeSpanEventController(TimeSpanEventService timeSpanEventService,
+                                   SystemAlarmService systemAlarmService) {
         this.timeSpanEventService = timeSpanEventService;
+        this.systemAlarmService = systemAlarmService;
         this.logger = LoggerFactory.getLogger(TimeSpanEventController.class);
     }
 
@@ -70,6 +74,7 @@ public class TimeSpanEventController extends ControllerBase {
         try {
             timeSpanEventService.addUserEvent(event);
             logger.info("给id={}的用户创建时间段事件成功", id);
+            systemAlarmService.refreshAlarms();
             return created(event);
         } catch (TimeSpanEventException e) {
             logger.error("给id={}的用户创建时间段时间失败 ", id, e);
@@ -92,6 +97,7 @@ public class TimeSpanEventController extends ControllerBase {
             timeSpanEventService.updateUserEvent(event);
 
             logger.info("成功修改id={}的用户的时间段事件", id);
+            systemAlarmService.refreshAlarms();
             return ok(event);
         } catch (TimeSpanEventException e) {
             logger.error("修改时间段事件失败 ", e);
@@ -113,6 +119,7 @@ public class TimeSpanEventController extends ControllerBase {
         try {
             timeSpanEventService.removeUserEvent(event);
             logger.info("删除指定用户的时间段事件成功");
+            systemAlarmService.refreshAlarms();
             return noContent();
         } catch (TimeSpanEventException e) {
             logger.error("删除指定用户的时间段事件失败 ", e);
@@ -163,6 +170,7 @@ public class TimeSpanEventController extends ControllerBase {
         try {
             timeSpanEventService.addGroupEvent(event);
             logger.info("给id={}的组织创建时间段事件成功", id);
+            systemAlarmService.refreshAlarms();
             return created(event);
         } catch (TimeSpanEventException e) {
             logger.error("给id={}的组织创建时间段事件失败 ", id, e);
@@ -184,6 +192,7 @@ public class TimeSpanEventController extends ControllerBase {
         try {
             timeSpanEventService.updateGroupEvent(event);
             logger.info("修改指定组织的时间段事件成功");
+            systemAlarmService.refreshAlarms();
             return ok(event);
         } catch (TimeSpanEventException e) {
             logger.error("修改指定组织的时间段事件失败 ", e);
@@ -205,6 +214,7 @@ public class TimeSpanEventController extends ControllerBase {
         try {
             timeSpanEventService.removeGroupEvent(event);
             logger.info("删除指定组织的时间段事件成功");
+            systemAlarmService.refreshAlarms();
             return noContent();
         } catch (TimeSpanEventException e) {
             logger.error("删除指定组织的时间段事件失败 ", e);
