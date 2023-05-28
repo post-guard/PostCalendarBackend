@@ -71,6 +71,12 @@ public class SystemClockServiceImpl implements SystemClockService, DisposableBea
     }
 
     @Override
+    public void reset() {
+        ClockTask.now = LocalDateTime.now();
+        ClockTask.time = 1;
+    }
+
+    @Override
     public void destroy() {
         running = false;
     }

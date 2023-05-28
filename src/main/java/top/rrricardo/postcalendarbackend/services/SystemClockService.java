@@ -33,4 +33,9 @@ public interface SystemClockService {
      * 启动时间服务
      */
     void start();
+
+    /**
+     * 重置时钟到标准时间
+     */
+    void reset();
 }

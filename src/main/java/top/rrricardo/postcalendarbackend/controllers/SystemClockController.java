@@ -71,4 +71,16 @@ public class SystemClockController extends ControllerBase {
         logger.info("设置时间成功");
         return ok(result);
     }
+
+    @PostMapping("/reset")
+    public ResponseEntity<ResponseDTO<SystemTimeDTO>> resetTime() {
+        systemClockService.reset();
+
+        var result = new SystemTimeDTO();
+        result.setNow(systemClockService.getNow());
+        result.setTime(systemClockService.getTime());
+
+        logger.info("重置时间成功");
+        return ok(result);
+    }
 }
