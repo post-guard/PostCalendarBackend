@@ -7,12 +7,12 @@ import jakarta.websocket.Session;
 import jakarta.websocket.server.ServerEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 
-@Service
+@Component
 @ServerEndpoint("/websocket/clock")
 public class ClockWebSocketServer {
     private static Session session = null;

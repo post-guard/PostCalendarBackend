@@ -14,6 +14,7 @@ import top.rrricardo.postcalendarbackend.services.SystemAlarmService;
 import top.rrricardo.postcalendarbackend.services.SystemClockService;
 import top.rrricardo.postcalendarbackend.services.TimePointEventService;
 import top.rrricardo.postcalendarbackend.services.TimeSpanEventService;
+import top.rrricardo.postcalendarbackend.websockets.AlarmWebSocketServer;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -69,7 +70,7 @@ public class SystemAlarmServiceImpl implements SystemAlarmService, DisposableBea
                         }
 
                         alarms.poll();
-                        logger.info(alarm.toString());
+                        AlarmWebSocketServer.sendAlarm(alarm);
                     }
                 }
             }
@@ -126,6 +127,7 @@ public class SystemAlarmServiceImpl implements SystemAlarmService, DisposableBea
 
     /**
      * 刷新指定日期的闹钟到闹钟列表中
+     *
      * @param date 需要刷新的列表
      */
     private void refreshAlarms(LocalDate date) {
@@ -140,10 +142,11 @@ public class SystemAlarmServiceImpl implements SystemAlarmService, DisposableBea
      * 这个时间段必须在在一天内
      *
      * @param beginTime 开始时间
-     * @param endTime 结束时间
+     * @param endTime   结束时间
      */
     private void refreshAlarms(LocalDateTime beginTime, LocalDateTime endTime) {
         var users = userMapper.getUsers();
+        var date = beginTime.toLocalDate();
 
         for (var user : users) {
             var userId = user.getId();
@@ -170,7 +173,13 @@ public class SystemAlarmServiceImpl implements SystemAlarmService, DisposableBea
                             20,
                             0,
                             0
-                    ), userId));
+                    ), userId,
+                            timeSpanEventService.queryUserEvent(userId,
+                                    LocalDateTime.of(date, LocalTime.MIN),
+                                    LocalDateTime.of(date, LocalTime.MAX)),
+                            timePointEventService.queryUserEvents(userId,
+                                    LocalDateTime.of(date, LocalTime.MIN),
+                                    LocalDateTime.of(date, LocalTime.MAX))));
                 }
             } catch (TimeSpanEventException e) {
                 logger.error("查询时间段时间错误", e);

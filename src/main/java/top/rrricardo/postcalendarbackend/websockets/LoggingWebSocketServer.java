@@ -5,11 +5,11 @@ import jakarta.websocket.server.ServerEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import top.rrricardo.postcalendarbackend.commons.LoggingQueue;
 
 
-@Service
+@Component
 @ServerEndpoint("/websocket/logging")
 public class LoggingWebSocketServer implements DisposableBean {
     private final Logger logger;

@@ -1,5 +1,10 @@
 package top.rrricardo.postcalendarbackend.models;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
 
@@ -31,10 +36,14 @@ public class TimeSpanEvent implements Comparable<TimeSpanEvent> {
     /**
      * 日程开始时间
      */
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime beginDateTime;
     /**
      * 日程结束时间
      */
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime endDateTime;
 
     public int getId() {
