@@ -28,6 +28,7 @@ public class CurrentGroupAdministratorAuthorizeService implements AuthorizeServi
             var link = groupLinkMapper.getGroupLinkByUserIdAndGroupId(user.getId(), id);
 
             if (link == null) {
+                logger.info("授权失败，该组织中不存在该用户");
                 return false;
             } else {
                 return link.getPermissionEnum().getCode() >= UserPermission.ADMIN.getCode();
