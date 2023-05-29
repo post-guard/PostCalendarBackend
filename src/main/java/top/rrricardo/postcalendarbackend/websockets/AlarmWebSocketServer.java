@@ -2,10 +2,7 @@ package top.rrricardo.postcalendarbackend.websockets;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.websocket.OnClose;
-import jakarta.websocket.OnError;
-import jakarta.websocket.OnOpen;
-import jakarta.websocket.Session;
+import jakarta.websocket.*;
 import jakarta.websocket.server.PathParam;
 import jakarta.websocket.server.ServerEndpoint;
 import org.slf4j.Logger;
@@ -53,6 +50,11 @@ public class AlarmWebSocketServer {
         } catch (IOException e) {
             logger.error("关闭websocket连接失败", e);
         }
+    }
+
+    @OnMessage
+    public void onMessage(Session session, String message) {
+        logger.debug("闹钟websocket收到：{}", message);
     }
 
     /**

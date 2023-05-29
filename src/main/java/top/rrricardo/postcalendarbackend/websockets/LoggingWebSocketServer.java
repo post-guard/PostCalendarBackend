@@ -41,14 +41,14 @@ public class LoggingWebSocketServer implements DisposableBean {
 
     @OnError
     public void onError(Session session, Throwable exception) {
-        logger.warn("日志WebSocket错误：" + exception.getMessage());
+        logger.error("日志WebSocket错误", exception);
 
         LoggingQueue.stop();
     }
 
     @OnMessage
     public void onMessage(Session session, String message) {
-        logger.info("日志WebSocket收到信息：" + message);
+        logger.debug("闹钟websocket收到：{}", message);
     }
 
     @OnClose

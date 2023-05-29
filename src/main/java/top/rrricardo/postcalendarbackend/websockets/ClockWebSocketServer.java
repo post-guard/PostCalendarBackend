@@ -1,9 +1,6 @@
 package top.rrricardo.postcalendarbackend.websockets;
 
-import jakarta.websocket.OnClose;
-import jakarta.websocket.OnError;
-import jakarta.websocket.OnOpen;
-import jakarta.websocket.Session;
+import jakarta.websocket.*;
 import jakarta.websocket.server.ServerEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +37,12 @@ public class ClockWebSocketServer {
     public void onError(Session session, Throwable exception) {
         ClockWebSocketServer.session = null;
 
-        logger.info("时钟推送服务遇到错误", exception);
+        logger.error("时钟推送服务遇到错误", exception);
+    }
+
+    @OnMessage
+    public void onMessage(Session session, String message) {
+        logger.debug("闹钟websocket收到：{}", message);
     }
 
     /**
