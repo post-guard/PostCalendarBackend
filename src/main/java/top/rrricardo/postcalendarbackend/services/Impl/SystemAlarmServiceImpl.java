@@ -57,6 +57,11 @@ public class SystemAlarmServiceImpl implements SystemAlarmService, DisposableBea
                 var alarm = alarms.peek();
 
                 if (alarm == null || now.isBefore(alarm.getTime())) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                     continue;
                 }
 
@@ -70,6 +75,7 @@ public class SystemAlarmServiceImpl implements SystemAlarmService, DisposableBea
                         }
 
                         alarms.poll();
+                        logger.info("闹钟触发成功：{}", alarm);
                         AlarmWebSocketServer.sendAlarm(alarm);
                     }
                 }
@@ -87,11 +93,13 @@ public class SystemAlarmServiceImpl implements SystemAlarmService, DisposableBea
 
                     // 当天已经在刷新时间之后
                     if (refreshDate == null) {
+                        logger.info("刷新闹钟队列日期: {}", today);
                         refreshAlarms(today);
                         refreshDate = today;
                     } else {
                         while (today.isAfter(refreshDate)) {
                             refreshDate = refreshDate.plusDays(1);
+                            logger.info("刷新闹钟队列日期: {}", refreshDate);
                             refreshAlarms(refreshDate);
                         }
                     }
@@ -110,6 +118,7 @@ public class SystemAlarmServiceImpl implements SystemAlarmService, DisposableBea
     @Async
     public void refreshAlarms() {
         var today = systemClockService.getNow();
+        logger.info("程序主动触发闹钟队列刷新");
 
         // 当调用这个接口时 清空闹钟列表
         alarms.clear();
