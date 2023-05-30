@@ -14,26 +14,31 @@ public class DictionaryTree {
         this.root = new TreeNode();
     }
 
+    /**
+     * 往字典树中插入一个事件
+     * @param event 待插入的事件
+     * @return 插入结果，如果插入成功，返回则true,失败（事件已存在）则返回false
+     */
+    public boolean insert(TimePointEvent event) {
+        return insert(root, event);
+    }
 
-    static class TreeNode{
-        String value;   //当前节点的内容（只允许存一个字）
-        CustomHashTable<String, TreeNode> Children;//子节点：下一个字作为key，下一个字对应的节点作为value
-        boolean isEnd;  //标记是否是某个存入的String的最终字符
-        CustomList<TimePointEvent> events;//如果isEnd为true，则该节点存入一个时间点事件
+    /**
+     * 查询以传入字符串为前缀的所有事件
+     * @param prefix 需要查询的前缀
+     * @return 查询结果列表
+     */
+    public CustomList<TimePointEvent> search(String prefix) {
+        return search(root, prefix);
+    }
 
-        //给根节点root用的构造方法
-        public TreeNode(){
-            this.Children = new CustomHashTable<>();
-            this.isEnd = false;
-        }
-
-        public TreeNode(String value){
-            this.value = value;
-            this.Children = new CustomHashTable<>();
-            this.isEnd = false;
-            this.events = new CustomList<>();
-        }
-
+    /**
+     * 从字典树中删除一个事件
+     * @param event 待删除的事件
+     * @return 删除结果，成功则返回true,失败返回false
+     */
+    public boolean remove(TimePointEvent event) {
+        return remove(root, event);
     }
 
 
@@ -43,7 +48,7 @@ public class DictionaryTree {
      * @param timePointEvent 待插入的事件
      * @return 插入结果，如果插入成功，返回则true,失败（事件已存在）则返回false
      */
-    public static boolean insert(TreeNode root, TimePointEvent timePointEvent){
+    private static boolean insert(TreeNode root, TimePointEvent timePointEvent){
         String str = timePointEvent.getName();
         //将字符串分割成单个的字
         String [] array = str.split("");
@@ -109,7 +114,7 @@ public class DictionaryTree {
      * @param str 输入的字符串(以此为前缀进行搜索)
      * @return 搜索结果的列表（没有搜到会返回一个空列表）
      */
-    public static CustomList<TimePointEvent> search(TreeNode root, String str){
+    private static CustomList<TimePointEvent> search(TreeNode root, String str){
         String [] array = str.split("");
 
         //遍历字典树
@@ -151,9 +156,7 @@ public class DictionaryTree {
                         dfs(tempNode.getValue());
                     }
                 }
-
             }
-
         }
 
         DFS.dfs(currentNode);
@@ -169,9 +172,7 @@ public class DictionaryTree {
         }
 
         return list0;
-
     }
-
 
     /**
      * 从字典树中删除一个事件
@@ -179,7 +180,7 @@ public class DictionaryTree {
      * @param timePointEvent 待删除的事件
      * @return 删除结果，成功则返回true,失败返回false
      */
-    public static boolean remove(TreeNode root, TimePointEvent timePointEvent){
+    private static boolean remove(TreeNode root, TimePointEvent timePointEvent){
         String str = timePointEvent.getName();
         String [] array = str.split("");
         //在字典树里去查这个字符串
@@ -254,5 +255,23 @@ public class DictionaryTree {
         return true;
     }
 
+    private static class TreeNode{
+        String value;   //当前节点的内容（只允许存一个字）
+        CustomHashTable<String, TreeNode> Children;//子节点：下一个字作为key，下一个字对应的节点作为value
+        boolean isEnd;  //标记是否是某个存入的String的最终字符
+        CustomList<TimePointEvent> events;//如果isEnd为true，则该节点存入一个时间点事件
 
+        //给根节点root用的构造方法
+        public TreeNode(){
+            this.Children = new CustomHashTable<>();
+            this.isEnd = false;
+        }
+
+        public TreeNode(String value){
+            this.value = value;
+            this.Children = new CustomHashTable<>();
+            this.isEnd = false;
+            this.events = new CustomList<>();
+        }
+    }
 }
