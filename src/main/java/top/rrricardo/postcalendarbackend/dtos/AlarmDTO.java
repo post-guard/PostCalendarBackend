@@ -16,6 +16,8 @@ import java.util.List;
 public class AlarmDTO {
     private String message;
 
+    private int alarmType;
+
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime alarmTime;
@@ -52,5 +54,13 @@ public class AlarmDTO {
 
     public void setAlarmTime(LocalDateTime alarmTime) {
         this.alarmTime = alarmTime;
+    }
+
+    public int getAlarmType() {
+        return alarmType;
+    }
+
+    public void setAlarmType(int alarmType) {
+        this.alarmType = alarmType;
     }
 }

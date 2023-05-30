@@ -65,6 +65,7 @@ public class AlarmWebSocketServer {
         var response = new AlarmDTO();
         response.setAlarmTime(alarm.getTime());
         response.setMessage(alarm.getTypeString());
+        response.setAlarmType(alarm.getType().ordinal());
 
         switch (alarm.getType()) {
             case OneHour, OnTime -> {
