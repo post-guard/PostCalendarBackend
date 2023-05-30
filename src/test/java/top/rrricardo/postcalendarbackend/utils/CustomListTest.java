@@ -128,4 +128,26 @@ public class CustomListTest {
             Assertions.assertEquals(expect.get(i), actual.get(i));
         }
     }
+
+    @Test
+    void testClear1() {
+        var actual = new CustomList<Integer>();
+
+        for (var i = 0; i < 100; i++) {
+            actual.add(i);
+        }
+
+        Assertions.assertEquals(100, actual.getSize());
+
+        actual.clear();
+        Assertions.assertEquals(0, actual.getSize());
+
+        for (var i = 0; i < 100; i++) {
+            actual.add(i);
+        }
+
+        for (var i = 0; i < 100; i++) {
+            Assertions.assertEquals(i, actual.get(i));
+        }
+    }
 }

@@ -249,6 +249,14 @@ public class CustomList<E> implements Iterable<E>  {
         return remove(size - 1);
     }
 
+    /**
+     * 清除数组中的对象
+     */
+    public void clear() {
+        size = 0;
+        elements = EmptyElementArray;
+    }
+
     @SuppressWarnings("unchecked")
     private E elementAt(int index) {
         return (E)elements[index];
@@ -292,7 +300,7 @@ public class CustomList<E> implements Iterable<E>  {
     }
 
     /**
-     * 自实现的排序算法
+     * 对列表进行原地排序
      * @param comparator 比较器
      */
     @SuppressWarnings("unchecked")
@@ -302,7 +310,7 @@ public class CustomList<E> implements Iterable<E>  {
     }
 
     //自实现的快排算法
-    public void quickSort(E [] array, int lowIndex, int highIndex, Comparator<E> comparator){
+    private void quickSort(E [] array, int lowIndex, int highIndex, Comparator<E> comparator){
         if (lowIndex >= highIndex) {
             return;
         }
