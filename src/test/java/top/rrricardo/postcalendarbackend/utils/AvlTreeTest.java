@@ -182,6 +182,12 @@ public class AvlTreeTest {
             Assertions.assertEquals(list.get(i), node);
             i++;
         }
+
+        i = 0;
+        for(var node : tree) {
+            Assertions.assertEquals(list.get(i), node);
+            i++;
+        }
     }
 
     @Test
@@ -227,6 +233,27 @@ public class AvlTreeTest {
 
         for (var i = 0; i < result.size(); i++) {
             Assertions.assertEquals(result.get(i), range.get(i));
+        }
+    }
+
+    @Test
+    void testToSortedList() throws AvlNodeRepeatException {
+        var tree = new AvlTree<Double>();
+        var except = new ArrayList<Double>();
+        var random = new Random();
+
+        for (var i = 0; i < 1000; i++) {
+            var number = random.nextDouble();
+
+            tree.insert(number);
+            except.add(number);
+        }
+
+        var actual = tree.toSortedList();
+        except.sort(Comparator.naturalOrder());
+
+        for (var i = 0; i < 1000; i++) {
+            Assertions.assertEquals(except.get(i), actual.get(i));
         }
     }
 }

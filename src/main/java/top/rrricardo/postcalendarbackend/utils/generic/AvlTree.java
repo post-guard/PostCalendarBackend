@@ -16,6 +16,12 @@ public class AvlTree<T extends Comparable<? super T>> implements Iterable<T> {
     private static final int AllowedImbalance = 1;
 
     /**
+     * 缓存🌳中对象的有序列表
+     */
+    private CustomList<T> sortedList = new CustomList<>();
+    private boolean modified = false;
+
+    /**
      * 想平衡树中插入一个节点
      *
      * @param data 需要插入节点的数据
@@ -30,6 +36,7 @@ public class AvlTree<T extends Comparable<? super T>> implements Iterable<T> {
         } else {
             insert(root, newNode);
         }
+        modified = true;
     }
 
     /**
@@ -39,10 +46,12 @@ public class AvlTree<T extends Comparable<? super T>> implements Iterable<T> {
      */
     public void remove(T data) {
         remove(root, data);
+        modified = true;
     }
 
     /**
      * 在树上查找指定的元素
+     *
      * @param target 需要查找的元素
      * @return 找到的元素，如果为空说明未找到
      */
@@ -75,9 +84,46 @@ public class AvlTree<T extends Comparable<? super T>> implements Iterable<T> {
         return preorderPrint(root).toString();
     }
 
+    /**
+     * 得到利用Avl树排序的有序列表
+     * 利用缓存提高性能
+     * @return 树中元素的有序列表
+     */
+    public CustomList<T> toSortedList() {
+        if (modified) {
+            var stack = new CustomStack<AvlTreeNode<T>>();
+            var result = new CustomList<T>();
+
+            // 初始化栈
+            appendNext(stack, root);
+
+            while (!stack.empty()) {
+                try {
+                    var node = stack.pop();
+
+                    if (node.rightNode != null) {
+                        appendNext(stack, node.rightNode);
+                    }
+
+                    result.add(node.data);
+                } catch (CustomStackEmptyException ignored) {
+
+                }
+            }
+
+            modified = false;
+            return result;
+        } else {
+            return sortedList;
+        }
+
+    }
+
     @Override
     public Iterator<T> iterator() {
-        return new CustomIterator();
+        sortedList = toSortedList();
+
+        return sortedList.iterator();
     }
 
     /**
@@ -204,8 +250,9 @@ public class AvlTree<T extends Comparable<? super T>> implements Iterable<T> {
 
     /**
      * 在树上查找指定的元素
+     *
      * @param target 需要查找的元素
-     * @param tree 需要查找的树
+     * @param tree   需要查找的树
      * @return 查找的结果，如果为null则为未找到
      */
     private T find(T target, AvlTreeNode<T> tree) {
@@ -383,6 +430,19 @@ public class AvlTree<T extends Comparable<? super T>> implements Iterable<T> {
         return findMinNode(node.leftNode);
     }
 
+    private void appendNext(CustomStack<AvlTreeNode<T>> stack, AvlTreeNode<T> root) {
+        if (root != null) {
+            var node = root;
+            stack.push(node);
+            node = node.leftNode;
+
+            while (node != null) {
+                stack.push(node);
+                node = node.leftNode;
+            }
+        }
+    }
+
     /**
      * 返回指定节点的高度
      *
@@ -391,57 +451,5 @@ public class AvlTree<T extends Comparable<? super T>> implements Iterable<T> {
      */
     private int height(AvlTreeNode<T> node) {
         return node != null ? node.height : 0;
-    }
-
-    private class CustomIterator implements Iterator<T> {
-        private final CustomStack<AvlTreeNode<T>> stack = new CustomStack<>();
-
-        public CustomIterator() {
-            appendNext(root);
-        }
-
-        @Override
-        public boolean hasNext() {
-            return !stack.empty();
-        }
-
-        @Override
-        public T next() {
-            if (!stack.empty()) {
-                try {
-                    var top = stack.pop();
-
-                    if (top.rightNode != null) {
-                        appendNext(top.rightNode);
-                    }
-
-                    return top.getData();
-                } catch (CustomStackEmptyException ignored) {
-                    // 已经判空了
-                    // 按道理不会到达这里
-                    return null;
-                }
-            } else {
-                return null;
-            }
-        }
-
-        /**
-         * 将一棵树的左子节点添加到栈中
-         *
-         * @param root 需要添加的树的根节点
-         */
-        private void appendNext(AvlTreeNode<T> root) {
-            if (root != null) {
-                var node = root;
-                stack.push(node);
-                node = node.leftNode;
-
-                while (node != null) {
-                    stack.push(node);
-                    node = node.leftNode;
-                }
-            }
-        }
     }
 }
