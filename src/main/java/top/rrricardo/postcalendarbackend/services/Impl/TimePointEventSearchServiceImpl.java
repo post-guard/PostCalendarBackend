@@ -53,10 +53,10 @@ public class TimePointEventSearchServiceImpl implements TimePointEventSearchServ
     }
 
     @Override
-    public void refreshUserTree(int userId) throws TimePointEventSearchException {
+    public void refreshUserTree(int userId) {
         var user = userMapper.getUserById(userId);
         if (user == null) {
-            throw new TimePointEventSearchException("刷新的用户不存在");
+            logger.warn("欲刷新的用户不存在: {}", userId);
         }
 
         var tree = forests.get(userId);

@@ -22,5 +22,5 @@ public interface TimePointEventSearchService {
      * 刷新该用户的字典树
      * @param userId 需要刷新的用户
      */
-    void refreshUserTree(int userId) throws TimePointEventSearchException;
+    void refreshUserTree(int userId);
 }
