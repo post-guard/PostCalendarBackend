@@ -272,12 +272,13 @@ public class NavigationServiceImpl implements NavigationService {
         CustomList <Place> tempList = new CustomList<>();
         for(i = 0; i + 1 < minList.getSize(); i++){
             //因为map3只存了上三角，所以要分类讨论
-            if(map3.get(minList.get(i)).get(minList.get(i+1)) == null){
+            //if的第一个条件用于防止索引最大时直接执行第二个条件导致异常
+            if(minList.get(i) == N - 1 || map3.get(minList.get(i)).get(minList.get(i+1)) == null){
                 tempList = map3.get(minList.get(i+1)).get(minList.get(i));
                 tempList.remove(tempList.getSize() - 1); //移除中间重复节点(最后一个)
                 //将tempList“倒着”并入reList
-                for(i = tempList.getSize() - 1; i >= 0; i--){
-                    reList.add(tempList.get(i));
+                for(j = tempList.getSize() - 1; j >= 0; j--){
+                    reList.add(tempList.get(j));
                 }
             }
             else{
