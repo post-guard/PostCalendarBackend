@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import top.rrricardo.postcalendarbackend.exceptions.AvlNodeRepeatException;
+import top.rrricardo.postcalendarbackend.exceptions.TimeConflictException;
 import top.rrricardo.postcalendarbackend.exceptions.TimePointEventException;
 import top.rrricardo.postcalendarbackend.exceptions.TimeSpanEventException;
 import top.rrricardo.postcalendarbackend.mappers.GroupLinkMapper;
@@ -51,7 +52,7 @@ public class TimePointEventServiceImpl implements TimePointEventService {
     }
 
     @Override
-    public void addUserEvent(TimePointEvent event) throws TimePointEventException {
+    public void addUserEvent(TimePointEvent event) throws TimePointEventException, TimeConflictException {
         var userId = event.getUserId();
 
         var user = userMapper.getUserById(userId);
@@ -69,7 +70,7 @@ public class TimePointEventServiceImpl implements TimePointEventService {
     }
 
     @Override
-    public void addGroupEvent(TimePointEvent event) throws TimePointEventException {
+    public void addGroupEvent(TimePointEvent event) throws TimePointEventException, TimeConflictException {
         var groupId = event.getGroupId();
 
         var group = groupMapper.getGroupById(groupId);
@@ -111,7 +112,7 @@ public class TimePointEventServiceImpl implements TimePointEventService {
     }
 
     @Override
-    public void updateUserEvent(TimePointEvent event) throws TimePointEventException {
+    public void updateUserEvent(TimePointEvent event) throws TimePointEventException, TimeConflictException {
         var userId = event.getUserId();
 
         var user = userMapper.getUserById(userId);
@@ -165,7 +166,7 @@ public class TimePointEventServiceImpl implements TimePointEventService {
     }
 
     @Override
-    public void updateGroupEvent(TimePointEvent event) throws TimePointEventException {
+    public void updateGroupEvent(TimePointEvent event) throws TimePointEventException, TimeConflictException {
         var groupId = event.getUserId();
 
         var group = groupMapper.getGroupById(groupId);

@@ -1,5 +1,6 @@
 package top.rrricardo.postcalendarbackend.services;
 
+import top.rrricardo.postcalendarbackend.exceptions.TimeConflictException;
 import top.rrricardo.postcalendarbackend.exceptions.TimePointEventException;
 import top.rrricardo.postcalendarbackend.models.TimePointEvent;
 import top.rrricardo.postcalendarbackend.utils.generic.CustomList;
@@ -12,14 +13,14 @@ public interface TimePointEventService {
      *
      * @param event 需要添加的事件
      */
-    void addUserEvent(TimePointEvent event) throws TimePointEventException;
+    void addUserEvent(TimePointEvent event) throws TimePointEventException, TimeConflictException;
 
     /**
      * 向指定的组织添加事件
      *
      * @param event 需要添加的事件
      */
-    void addGroupEvent(TimePointEvent event) throws TimePointEventException;
+    void addGroupEvent(TimePointEvent event) throws TimePointEventException, TimeConflictException;
 
     /**
      * 从指定的用户删除事件
@@ -40,14 +41,14 @@ public interface TimePointEventService {
      *
      * @param event 修改的事件
      */
-    void updateUserEvent(TimePointEvent event) throws TimePointEventException;
+    void updateUserEvent(TimePointEvent event) throws TimePointEventException, TimeConflictException;
 
     /**
      * 修改指定组织的事件
      *
      * @param event 修改的事件
      */
-    void updateGroupEvent(TimePointEvent event) throws TimePointEventException;
+    void updateGroupEvent(TimePointEvent event) throws TimePointEventException, TimeConflictException;
 
     /**
      * 查询指定用户在指定时间段内的事件

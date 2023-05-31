@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import top.rrricardo.postcalendarbackend.exceptions.AvlNodeRepeatException;
+import top.rrricardo.postcalendarbackend.exceptions.TimeConflictException;
 import top.rrricardo.postcalendarbackend.exceptions.TimeSpanEventException;
 import top.rrricardo.postcalendarbackend.mappers.GroupLinkMapper;
 import top.rrricardo.postcalendarbackend.mappers.GroupMapper;
@@ -45,7 +46,7 @@ public class TimeSpanEventServiceImpl implements TimeSpanEventService {
     }
 
     @Override
-    public void addUserEvent(TimeSpanEvent event) throws TimeSpanEventException {
+    public void addUserEvent(TimeSpanEvent event) throws TimeSpanEventException, TimeConflictException {
         var userId = event.getUserId();
 
         // 判断冲突
@@ -55,7 +56,7 @@ public class TimeSpanEventServiceImpl implements TimeSpanEventService {
     }
 
     @Override
-    public void addGroupEvent(TimeSpanEvent event) throws TimeSpanEventException {
+    public void addGroupEvent(TimeSpanEvent event) throws TimeSpanEventException, TimeConflictException {
         var groupId = event.getGroupId();
 
         judgeGroupTimeConflict(event.getBeginDateTime(), event.getEndDateTime(), groupId);
@@ -78,7 +79,7 @@ public class TimeSpanEventServiceImpl implements TimeSpanEventService {
     }
 
     @Override
-    public void updateUserEvent(TimeSpanEvent event) throws TimeSpanEventException {
+    public void updateUserEvent(TimeSpanEvent event) throws TimeSpanEventException, TimeConflictException {
         var userId = event.getUserId();
 
         var tree = userEventForest.get(userId);
@@ -113,7 +114,8 @@ public class TimeSpanEventServiceImpl implements TimeSpanEventService {
 
             // 在重新添加之前得判断冲突
             if (judgeConflictHelper(event, tree)) {
-                throw new TimeSpanEventException("同用户的事件发生冲突");
+                throw new TimeConflictException(userId, 0,
+                        event.getBeginDateTime(), event.getEndDateTime());
             }
 
             var groupLinks = groupLinkMapper.getGroupLinksByUserId(userId);
@@ -122,7 +124,8 @@ public class TimeSpanEventServiceImpl implements TimeSpanEventService {
 
                 if (groupTree != null) {
                     if (judgeConflictHelper(event, groupTree)) {
-                        throw new TimeSpanEventException("同用户所在组织的事件发生冲突");
+                        throw new TimeConflictException(0, groupLink.getGroupId(),
+                                event.getBeginDateTime(), event.getEndDateTime());
                     }
                 }
             }
@@ -131,14 +134,14 @@ public class TimeSpanEventServiceImpl implements TimeSpanEventService {
             try {
                 tree.insert(event);
             } catch (AvlNodeRepeatException exception) {
-                throw new TimeSpanEventException("发生冲突");
+                throw new TimeConflictException(userId, 0, event.getBeginDateTime(), event.getEndDateTime());
             }
         }
         eventMapper.updateEvent(event);
     }
 
     @Override
-    public void updateGroupEvent(TimeSpanEvent event) throws TimeSpanEventException {
+    public void updateGroupEvent(TimeSpanEvent event) throws TimeSpanEventException, TimeConflictException {
         var groupId = event.getGroupId();
 
         var tree = groupEventForest.get(groupId);
@@ -177,7 +180,8 @@ public class TimeSpanEventServiceImpl implements TimeSpanEventService {
                 } catch (AvlNodeRepeatException e) {
                     throw new TimeSpanEventException("发生冲突");
                 }
-                throw new TimeSpanEventException("同组织内的事件发生冲突");
+                throw new TimeConflictException(0, groupId,
+                        event.getBeginDateTime(), event.getEndDateTime());
             }
 
             var groupLinks = groupLinkMapper.getGroupLinksByGroupId(groupId);
@@ -190,9 +194,11 @@ public class TimeSpanEventServiceImpl implements TimeSpanEventService {
                         try {
                             tree.insert(oldEvent);
                         } catch (AvlNodeRepeatException e) {
-                            throw new TimeSpanEventException("发生冲突");
+                            throw new TimeConflictException(0, groupId,
+                                    oldEvent.getBeginDateTime(), oldEvent.getEndDateTime());
                         }
-                        throw new TimeSpanEventException("同组织内成员的事件发生冲突");
+                        throw new TimeConflictException(groupLink.getUserId(), 0,
+                                event.getBeginDateTime(), event.getEndDateTime());
                     }
                 }
             }
@@ -200,7 +206,7 @@ public class TimeSpanEventServiceImpl implements TimeSpanEventService {
             try {
                 tree.insert(event);
             } catch (AvlNodeRepeatException e) {
-                throw new TimeSpanEventException("发生冲突");
+                throw new TimeConflictException(0, groupId, event.getBeginDateTime(), event.getEndDateTime());
             }
         }
         eventMapper.updateEvent(event);
@@ -227,7 +233,8 @@ public class TimeSpanEventServiceImpl implements TimeSpanEventService {
     }
 
     @Override
-    public void judgeUserTimeConflict(LocalDateTime beginTime, LocalDateTime endTime, int userId) throws TimeSpanEventException {
+    public void judgeUserTimeConflict(LocalDateTime beginTime, LocalDateTime endTime, int userId)
+            throws TimeSpanEventException, TimeConflictException {
         var tree = userEventForest.get(userId);
         var user = userMapper.getUserById(userId);
 
@@ -249,7 +256,8 @@ public class TimeSpanEventServiceImpl implements TimeSpanEventService {
     }
 
     @Override
-    public void judgeGroupTimeConflict(LocalDateTime beginTime, LocalDateTime endTime, int groupId) throws TimeSpanEventException {
+    public void judgeGroupTimeConflict(LocalDateTime beginTime, LocalDateTime endTime, int groupId)
+            throws TimeSpanEventException, TimeConflictException {
         var tree = groupEventForest.get(groupId);
         var group = groupMapper.getGroupById(groupId);
 
@@ -476,12 +484,11 @@ public class TimeSpanEventServiceImpl implements TimeSpanEventService {
      * @param event 需要添加的事件
      * @param userId 添加事件的用户
      * @param tree 即将添加的树
-     * @throws TimeSpanEventException 如果发生冲突引发的异常
      */
     private void judgeUserConflictHelper(TimeSpanEvent event, int userId, AvlTree<TimeSpanEvent> tree)
-        throws TimeSpanEventException {
+            throws TimeConflictException {
         if (judgeConflictHelper(event, tree)) {
-            throw new TimeSpanEventException("同用户的事件发生冲突");
+            throw new TimeConflictException(userId, 0, event.getBeginDateTime(), event.getEndDateTime());
         }
 
         var groupLinks = groupLinkMapper.getGroupLinksByUserId(userId);
@@ -490,7 +497,8 @@ public class TimeSpanEventServiceImpl implements TimeSpanEventService {
             var groupTree = groupEventForest.get(groupLink.getGroupId());
 
             if (judgeConflictHelper(event, groupTree)) {
-                throw new TimeSpanEventException("同用户所在组织的事件发生冲突");
+                throw new TimeConflictException(0, groupLink.getGroupId(),
+                        event.getBeginDateTime(), event.getEndDateTime());
             }
         }
     }
@@ -500,28 +508,16 @@ public class TimeSpanEventServiceImpl implements TimeSpanEventService {
      * @param event 需要添加的事件
      * @param groupId 添加事件的用户
      * @param tree 即将添加的树
-     * @throws TimeSpanEventException 如果发生冲突引发的异常
+     * @throws TimeConflictException 如果发生冲突引发的异常
      */
     private void judgeGroupConflictHelper(TimeSpanEvent event, int groupId, AvlTree<TimeSpanEvent> tree)
-        throws TimeSpanEventException {
+        throws TimeConflictException {
         if (judgeConflictHelper(event, tree)) {
-            throw new TimeSpanEventException("同组织内的事件发生冲突");
+            throw new TimeConflictException(0 ,groupId,
+                    event.getBeginDateTime(), event.getEndDateTime());
         }
 
         // 我们想了一下 认为判断组织内事件是否发生冲突不用考虑组织内的用户
         // 例如308组织下午要军训，不能因为308有个哥们需要恰麦当劳而爆炸
-        /*var groupLinks = groupLinkMapper.getGroupLinksByGroupId(groupId);
-
-        for (var groupLink : groupLinks) {
-            var groupTree = groupEventForest.get(groupLink.getUserId());
-
-            if (groupTree == null) {
-                continue;
-            }
-
-            if (judgeConflictHelper(event, groupTree)) {
-                throw new TimeSpanEventException("同组织中用户的事件发生冲突");
-            }
-        }*/
     }
 }
