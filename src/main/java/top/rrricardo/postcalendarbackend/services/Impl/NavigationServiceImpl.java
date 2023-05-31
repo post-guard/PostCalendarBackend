@@ -302,6 +302,10 @@ public class NavigationServiceImpl implements NavigationService {
             reList.add(tempList.get(i));
         }
 
+        //返回前清空fullArrange里的list(因为它是static的)
+        fullArrange.list.clear();
+
+
         return reList;
 
     }
