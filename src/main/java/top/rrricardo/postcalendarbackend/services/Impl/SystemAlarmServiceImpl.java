@@ -159,36 +159,45 @@ public class SystemAlarmServiceImpl implements SystemAlarmService, DisposableBea
 
         for (var user : users) {
             var userId = user.getId();
-            // 添加时间段闹钟
+
             try {
                 var timeSpanEvents = timeSpanEventService.queryUserEvent(userId, beginTime, endTime);
                 var timePointEvents = timePointEventService.queryUserEvents(userId, beginTime, endTime);
 
                 synchronized (alarms) {
+                    // 添加时间段事件闹钟
                     for (var event : timeSpanEvents) {
                         alarms.add(new Alarm(event, AlarmType.OneHour, userId));
                         alarms.add(new Alarm(event, AlarmType.OnTime, userId));
                     }
 
+                    // 添加时间点事件闹钟
                     for (var event : timePointEvents) {
                         alarms.add(new Alarm(event, AlarmType.OneHour, userId));
                         alarms.add(new Alarm(event, AlarmType.OnTime, userId));
                     }
 
-                    alarms.add(new Alarm(AlarmType.Tomorrow, LocalDateTime.of(
-                            beginTime.getYear(),
-                            beginTime.getMonth(),
-                            beginTime.getDayOfMonth(),
-                            20,
-                            0,
-                            0
-                    ), userId,
-                            timeSpanEventService.queryUserEvent(userId,
-                                    LocalDateTime.of(date, LocalTime.MIN),
-                                    LocalDateTime.of(date, LocalTime.MAX)),
-                            timePointEventService.queryUserEvents(userId,
-                                    LocalDateTime.of(date, LocalTime.MIN),
-                                    LocalDateTime.of(date, LocalTime.MAX))));
+                    // 提醒第二天事件闹钟
+                    date = date.plusDays(1);
+                    var now = systemClockService.getNow();
+                    if (now.toLocalTime().isAfter(LocalTime.of(20, 0))) {
+                        // 如果当前时间已经在晚上8点之后
+                        // 不再添加提醒第二天事件闹钟
+                        alarms.add(new Alarm(AlarmType.Tomorrow, LocalDateTime.of(
+                                beginTime.getYear(),
+                                beginTime.getMonth(),
+                                beginTime.getDayOfMonth(),
+                                20,
+                                0,
+                                0
+                        ), userId,
+                                timeSpanEventService.queryUserEvent(userId,
+                                        LocalDateTime.of(date, LocalTime.MIN),
+                                        LocalDateTime.of(date, LocalTime.MAX)),
+                                timePointEventService.queryUserEvents(userId,
+                                        LocalDateTime.of(date, LocalTime.MIN),
+                                        LocalDateTime.of(date, LocalTime.MAX))));
+                    }
                 }
             } catch (TimeSpanEventException e) {
                 logger.error("查询时间段时间错误", e);

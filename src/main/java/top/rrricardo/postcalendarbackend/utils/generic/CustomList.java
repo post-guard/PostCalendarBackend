@@ -257,6 +257,60 @@ public class CustomList<E> implements Iterable<E>  {
         elements = EmptyElementArray;
     }
 
+    /**
+     * 将有序列表的列表合成一个有序列表
+     * @param arrays 有序列表的列表
+     * @return 合并之后的有序列表
+     * @param <T> 存储的对象
+     */
+    public static <T extends Comparable<? super T>> CustomList<T> polymerize(CustomList<CustomList<T>> arrays) {
+        // 利用小根堆归并多个数组
+        class Node implements Comparable<Node> {
+            private final T value;
+            private final int arrayPos;
+            private final int pos;
+
+            Node(T value, int arrayPos, int pos) {
+                this.value = value;
+                this.arrayPos = arrayPos;
+                this.pos = pos;
+            }
+
+            @Override
+            public int compareTo(Node node) {
+                return value.compareTo(node.value);
+            }
+        }
+
+        var sizeSum = 0;
+        var heap = new Heap<Node>();
+        var result = new CustomList<T>();
+
+        var arrayPos = 0;
+        for (var array : arrays) {
+            sizeSum = sizeSum + array.getSize();
+            if (array.getSize() == 0) {
+                continue;
+            }
+
+            heap.add(new Node(array.get(0), arrayPos, 0));
+            arrayPos++;
+        }
+
+        for (var i = 0; i < sizeSum; i++) {
+            var current = heap.poll();
+            result.add(current.value);
+
+            if (current.pos + 1 < arrays.get(current.arrayPos).getSize()) {
+                // 当前数组还没有遍历结束
+                heap.add(new Node(arrays.get(current.arrayPos).get(current.pos + 1),
+                        current.arrayPos, current.pos + 1));
+            }
+        }
+
+        return result;
+    }
+
     @SuppressWarnings("unchecked")
     private E elementAt(int index) {
         return (E)elements[index];

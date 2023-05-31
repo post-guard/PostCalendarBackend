@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import top.rrricardo.postcalendarbackend.annotations.Authorize;
 import top.rrricardo.postcalendarbackend.dtos.ResponseDTO;
 import top.rrricardo.postcalendarbackend.enums.AuthorizePolicy;
+import top.rrricardo.postcalendarbackend.exceptions.TimeConflictException;
 import top.rrricardo.postcalendarbackend.exceptions.TimeSpanEventException;
 import top.rrricardo.postcalendarbackend.models.TimeSpanEvent;
 import top.rrricardo.postcalendarbackend.services.SystemAlarmService;
@@ -79,6 +80,9 @@ public class TimeSpanEventController extends ControllerBase {
         } catch (TimeSpanEventException e) {
             logger.error("给id={}的用户创建时间段时间失败 ", id, e);
             return badRequest(e.getMessage());
+        } catch (TimeConflictException e) {
+            logger.info("检测到冲突");
+            return badRequest("检测到冲突");
         }
     }
 
@@ -102,6 +106,10 @@ public class TimeSpanEventController extends ControllerBase {
         } catch (TimeSpanEventException e) {
             logger.error("修改时间段事件失败 ", e);
             return badRequest(e.getMessage());
+        } catch (TimeConflictException e) {
+            logger.info("检测到冲突");
+
+            return badRequest("发生冲突");
         }
     }
 
@@ -175,6 +183,10 @@ public class TimeSpanEventController extends ControllerBase {
         } catch (TimeSpanEventException e) {
             logger.error("给id={}的组织创建时间段事件失败 ", id, e);
             return badRequest(e.getMessage());
+        } catch (TimeConflictException e) {
+            logger.info("检测到冲突");
+
+            return badRequest("发生冲突");
         }
     }
 
@@ -197,6 +209,10 @@ public class TimeSpanEventController extends ControllerBase {
         } catch (TimeSpanEventException e) {
             logger.error("修改指定组织的时间段事件失败 ", e);
             return badRequest(e.getMessage());
+        } catch (TimeConflictException e) {
+            logger.info("检测到冲突");
+
+            return badRequest("发生冲突");
         }
     }
 

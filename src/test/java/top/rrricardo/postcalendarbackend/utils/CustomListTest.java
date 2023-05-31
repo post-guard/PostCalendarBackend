@@ -150,4 +150,35 @@ public class CustomListTest {
             Assertions.assertEquals(i, actual.get(i));
         }
     }
+
+    @Test
+    void testPolymerize() {
+        var list1 = new CustomList<Integer>();
+        list1.add(1);
+        list1.add(4);
+        list1.add(7);
+
+        var list2 = new CustomList<Integer>();
+        list2.add(2);
+        list2.add(5);
+
+        var list3 = new CustomList<Integer>();
+        list3.add(3);
+        list3.add(6);
+        list3.add(8);
+
+        var list4 = new CustomList<Integer>();
+
+        var input = new CustomList<CustomList<Integer>>();
+        input.add(list1);
+        input.add(list2);
+        input.add(list3);
+        input.add(list4);
+
+        var result = CustomList.polymerize(input);
+
+        for (var i = 1; i < 9; i++) {
+            Assertions.assertEquals(i, result.get(i - 1));
+        }
+    }
 }

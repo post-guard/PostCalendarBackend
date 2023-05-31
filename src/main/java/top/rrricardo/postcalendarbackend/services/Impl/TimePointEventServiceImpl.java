@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import top.rrricardo.postcalendarbackend.exceptions.AvlNodeRepeatException;
+import top.rrricardo.postcalendarbackend.exceptions.TimeConflictException;
 import top.rrricardo.postcalendarbackend.exceptions.TimePointEventException;
 import top.rrricardo.postcalendarbackend.exceptions.TimeSpanEventException;
 import top.rrricardo.postcalendarbackend.mappers.GroupLinkMapper;
@@ -11,6 +12,7 @@ import top.rrricardo.postcalendarbackend.mappers.GroupMapper;
 import top.rrricardo.postcalendarbackend.mappers.TimePointEventMapper;
 import top.rrricardo.postcalendarbackend.mappers.UserMapper;
 import top.rrricardo.postcalendarbackend.models.TimePointEvent;
+import top.rrricardo.postcalendarbackend.services.SystemClockService;
 import top.rrricardo.postcalendarbackend.services.TimePointEventService;
 import top.rrricardo.postcalendarbackend.services.TimeSpanEventService;
 import top.rrricardo.postcalendarbackend.utils.generic.AvlTree;
@@ -29,6 +31,7 @@ public class TimePointEventServiceImpl implements TimePointEventService {
     private final GroupMapper groupMapper;
     private final GroupLinkMapper groupLinkMapper;
     private final TimeSpanEventService timeSpanEventService;
+    private final SystemClockService systemClockService;
 
     private final Logger logger;
 
@@ -37,13 +40,15 @@ public class TimePointEventServiceImpl implements TimePointEventService {
             UserMapper userMapper,
             GroupMapper groupMapper,
             GroupLinkMapper groupLinkMapper,
-            TimeSpanEventService timeSpanEventService
+            TimeSpanEventService timeSpanEventService,
+            SystemClockService systemClockService
     ) {
         this.eventMapper = eventMapper;
         this.userMapper = userMapper;
         this.groupMapper = groupMapper;
         this.groupLinkMapper = groupLinkMapper;
         this.timeSpanEventService = timeSpanEventService;
+        this.systemClockService = systemClockService;
 
         logger = LoggerFactory.getLogger(TimePointEventServiceImpl.class);
 
@@ -51,7 +56,7 @@ public class TimePointEventServiceImpl implements TimePointEventService {
     }
 
     @Override
-    public void addUserEvent(TimePointEvent event) throws TimePointEventException {
+    public void addUserEvent(TimePointEvent event) throws TimePointEventException, TimeConflictException {
         var userId = event.getUserId();
 
         var user = userMapper.getUserById(userId);
@@ -69,7 +74,7 @@ public class TimePointEventServiceImpl implements TimePointEventService {
     }
 
     @Override
-    public void addGroupEvent(TimePointEvent event) throws TimePointEventException {
+    public void addGroupEvent(TimePointEvent event) throws TimePointEventException, TimeConflictException {
         var groupId = event.getGroupId();
 
         var group = groupMapper.getGroupById(groupId);
@@ -111,7 +116,7 @@ public class TimePointEventServiceImpl implements TimePointEventService {
     }
 
     @Override
-    public void updateUserEvent(TimePointEvent event) throws TimePointEventException {
+    public void updateUserEvent(TimePointEvent event) throws TimePointEventException, TimeConflictException {
         var userId = event.getUserId();
 
         var user = userMapper.getUserById(userId);
@@ -165,7 +170,7 @@ public class TimePointEventServiceImpl implements TimePointEventService {
     }
 
     @Override
-    public void updateGroupEvent(TimePointEvent event) throws TimePointEventException {
+    public void updateGroupEvent(TimePointEvent event) throws TimePointEventException, TimeConflictException {
         var groupId = event.getUserId();
 
         var group = groupMapper.getGroupById(groupId);
@@ -226,16 +231,16 @@ public class TimePointEventServiceImpl implements TimePointEventService {
             throw new TimePointEventException("查询的用户不存在");
         }
 
-        var result = queryEventHelper(userEventForest, userId, beginTime, endTime);
+        var eventsArray = new CustomList<CustomList<TimePointEvent>>();
+        eventsArray.add(queryEventHelper(userEventForest, userId, beginTime, endTime));
 
         var groupLinks = groupLinkMapper.getGroupLinksByUserId(userId);
         for (var groupLink : groupLinks) {
-            for (var item : queryEventHelper(groupEventForest, groupLink.getGroupId(), beginTime, endTime)) {
-                result.add(item);
-            }
+            eventsArray.add(queryEventHelper(groupEventForest, groupLink.getGroupId(), beginTime, endTime));
         }
 
-        return result;
+        var events = CustomList.polymerize(eventsArray);
+        return filterOutdatedEventHelper(events);
     }
 
     @Override
@@ -245,7 +250,8 @@ public class TimePointEventServiceImpl implements TimePointEventService {
             throw new TimePointEventException("查询的组织不存在");
         }
 
-        return queryEventHelper(groupEventForest, groupId, beginTime, endTime);
+        var events = queryEventHelper(groupEventForest, groupId, beginTime, endTime);
+        return filterOutdatedEventHelper(events);
     }
 
     private void refreshDataFromDatabase() {
@@ -363,6 +369,41 @@ public class TimePointEventServiceImpl implements TimePointEventService {
                     result.add(item);
                 }
             }
+        }
+
+        return result;
+    }
+
+    /**
+     * 将已过期的事件移动到未过期事件之后
+     * @param events 有序的事件列表
+     * @return 未过期事件在前 已过期事件在后的列表
+     */
+    private CustomList<TimePointEvent> filterOutdatedEventHelper(CustomList<TimePointEvent> events) {
+        var outdatedEvents = new CustomList<TimePointEvent>();
+        var result = new CustomList<TimePointEvent>();
+        var now = systemClockService.getNow();
+
+        // 将已经过期的事件放在未过期事件之后
+        var iterator = events.iterator();
+        while (iterator.hasNext()) {
+            var node = iterator.next();
+
+            if (node.getEndDateTime().isAfter(now)) {
+                // 在当前时间之后
+                result.add(node);
+                break;
+            }
+
+            outdatedEvents.add(node);
+        }
+
+        while (iterator.hasNext()) {
+            result.add(iterator.next());
+        }
+
+        for (var event : outdatedEvents) {
+            result.add(event);
         }
 
         return result;
