@@ -159,22 +159,26 @@ public class SystemAlarmServiceImpl implements SystemAlarmService, DisposableBea
 
         for (var user : users) {
             var userId = user.getId();
-            // 添加时间段闹钟
+
             try {
                 var timeSpanEvents = timeSpanEventService.queryUserEvent(userId, beginTime, endTime);
                 var timePointEvents = timePointEventService.queryUserEvents(userId, beginTime, endTime);
 
                 synchronized (alarms) {
+                    // 添加时间段事件闹钟
                     for (var event : timeSpanEvents) {
                         alarms.add(new Alarm(event, AlarmType.OneHour, userId));
                         alarms.add(new Alarm(event, AlarmType.OnTime, userId));
                     }
 
+                    // 添加时间点事件闹钟
                     for (var event : timePointEvents) {
                         alarms.add(new Alarm(event, AlarmType.OneHour, userId));
                         alarms.add(new Alarm(event, AlarmType.OnTime, userId));
                     }
 
+                    // 提醒第二天事件闹钟
+                    date = date.plusDays(1);
                     alarms.add(new Alarm(AlarmType.Tomorrow, LocalDateTime.of(
                             beginTime.getYear(),
                             beginTime.getMonth(),
