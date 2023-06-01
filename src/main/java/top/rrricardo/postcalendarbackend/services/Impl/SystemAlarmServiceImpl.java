@@ -180,7 +180,7 @@ public class SystemAlarmServiceImpl implements SystemAlarmService, DisposableBea
                     // 提醒第二天事件闹钟
                     date = date.plusDays(1);
                     var now = systemClockService.getNow();
-                    if (now.toLocalTime().isAfter(LocalTime.of(20, 0))) {
+                    if (now.toLocalTime().isBefore(LocalTime.of(20, 0))) {
                         // 如果当前时间已经在晚上8点之后
                         // 不再添加提醒第二天事件闹钟
                         alarms.add(new Alarm(AlarmType.Tomorrow, LocalDateTime.of(
