@@ -44,7 +44,7 @@ public class SpareTimeServiceImpl implements SpareTimeService {
             }
 
             return result;
-        } catch (TimeSpanEventException e) {
+        } catch (Exception e) {
             logger.warn("查询用户{} 日期{}的时间点事件失败", userId, date, e);
             return null;
         }
@@ -69,13 +69,17 @@ public class SpareTimeServiceImpl implements SpareTimeService {
             }
 
             return result;
-        } catch (TimeSpanEventException e) {
+        } catch (Exception e) {
             logger.warn("查询组织{} 日期{}的事件失败", groupId, date, e);
             return null;
         }
     }
 
     private CustomList<SpareTime> findSpareTimeHelper(CustomList<TimeSpanEvent> events, int length) {
+        if (length < 0) {
+            throw new IllegalArgumentException("时间段长度不能为负数");
+        }
+
         // 生成时间占用数组
         // 表示每一秒被占用的次数
         var occupationArray = new byte[86400];
@@ -109,6 +113,12 @@ public class SpareTimeServiceImpl implements SpareTimeService {
             spareTime.endTimeSecond = pos + length;
             spareTime.occupation = occupation;
             spareTimes.add(spareTime);
+
+            if (occupation == 0) {
+                // 该阶段没有占用
+                pos = pos + length;
+                continue;
+            }
 
             if (occupation >= lastOccupation) {
                 // 当前占用率大于上一段占用率

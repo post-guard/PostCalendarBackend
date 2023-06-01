@@ -1,5 +1,6 @@
 package top.rrricardo.postcalendarbackend.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -10,10 +11,12 @@ import top.rrricardo.postcalendarbackend.enums.AuthorizePolicy;
 import top.rrricardo.postcalendarbackend.exceptions.TimeConflictException;
 import top.rrricardo.postcalendarbackend.exceptions.TimeSpanEventException;
 import top.rrricardo.postcalendarbackend.models.TimeSpanEvent;
+import top.rrricardo.postcalendarbackend.services.SpareTimeService;
 import top.rrricardo.postcalendarbackend.services.SystemAlarmService;
 import top.rrricardo.postcalendarbackend.services.TimeSpanEventService;
 import top.rrricardo.postcalendarbackend.utils.ControllerBase;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -24,11 +27,18 @@ import java.util.List;
 public class TimeSpanEventController extends ControllerBase {
     private final TimeSpanEventService timeSpanEventService;
     private final SystemAlarmService systemAlarmService;
+    private final SpareTimeService spareTimeService;
     private final Logger logger;
+    private final ObjectMapper objectMapper;
+
     public TimeSpanEventController(TimeSpanEventService timeSpanEventService,
-                                   SystemAlarmService systemAlarmService) {
+                                   SystemAlarmService systemAlarmService,
+                                   SpareTimeService spareTimeService) {
         this.timeSpanEventService = timeSpanEventService;
         this.systemAlarmService = systemAlarmService;
+        this.spareTimeService = spareTimeService;
+
+        objectMapper = new ObjectMapper();
         this.logger = LoggerFactory.getLogger(TimeSpanEventController.class);
     }
 
@@ -82,7 +92,20 @@ public class TimeSpanEventController extends ControllerBase {
             return badRequest(e.getMessage());
         } catch (TimeConflictException e) {
             logger.info("检测到冲突");
-            return badRequest("检测到冲突");
+            // 调用推荐时间算法
+            try {
+                var spareTimes = spareTimeService.queryUserSpareTime(
+                        id,
+                        e.getBeginTime().toLocalDate(),
+                        Duration.between(e.getBeginTime().toLocalTime(), e.getEndTime().toLocalTime())
+                );
+                var message = objectMapper.writeValueAsString(spareTimes.toList());
+
+                return new ResponseEntity<>(new ResponseDTO<>(message, null), null, 444);
+            } catch (Exception exception) {
+                logger.error("获得最小冲突时间中遇到错误", exception);
+                return badRequest("获取最小冲突时间失败");
+            }
         }
     }
 
@@ -108,8 +131,20 @@ public class TimeSpanEventController extends ControllerBase {
             return badRequest(e.getMessage());
         } catch (TimeConflictException e) {
             logger.info("检测到冲突");
+            // 调用推荐时间算法
+            try {
+                var spareTimes = spareTimeService.queryUserSpareTime(
+                        id,
+                        e.getBeginTime().toLocalDate(),
+                        Duration.between(e.getBeginTime().toLocalTime(), e.getEndTime().toLocalTime())
+                );
+                var message = objectMapper.writeValueAsString(spareTimes.toList());
 
-            return badRequest("发生冲突");
+                return new ResponseEntity<>(new ResponseDTO<>(message, null), null, 444);
+            } catch (Exception exception) {
+                logger.error("获得最小冲突时间中遇到错误", exception);
+                return badRequest("获取最小冲突时间失败");
+            }
         }
     }
 
@@ -185,8 +220,20 @@ public class TimeSpanEventController extends ControllerBase {
             return badRequest(e.getMessage());
         } catch (TimeConflictException e) {
             logger.info("检测到冲突");
+            // 调用推荐时间算法
+            try {
+                var spareTimes = spareTimeService.queryUserSpareTime(
+                        id,
+                        e.getBeginTime().toLocalDate(),
+                        Duration.between(e.getBeginTime().toLocalTime(), e.getEndTime().toLocalTime())
+                );
+                var message = objectMapper.writeValueAsString(spareTimes.toList());
 
-            return badRequest("发生冲突");
+                return new ResponseEntity<>(new ResponseDTO<>(message, null), null, 444);
+            } catch (Exception exception) {
+                logger.error("获得最小冲突时间中遇到错误", exception);
+                return badRequest("获取最小冲突时间失败");
+            }
         }
     }
 
@@ -211,8 +258,20 @@ public class TimeSpanEventController extends ControllerBase {
             return badRequest(e.getMessage());
         } catch (TimeConflictException e) {
             logger.info("检测到冲突");
+            // 调用推荐时间算法
+            try {
+                var spareTimes = spareTimeService.queryUserSpareTime(
+                        id,
+                        e.getBeginTime().toLocalDate(),
+                        Duration.between(e.getBeginTime().toLocalTime(), e.getEndTime().toLocalTime())
+                );
+                var message = objectMapper.writeValueAsString(spareTimes.toList());
 
-            return badRequest("发生冲突");
+                return new ResponseEntity<>(new ResponseDTO<>(message, null), null, 444);
+            } catch (Exception exception) {
+                logger.error("获得最小冲突时间中遇到错误", exception);
+                return badRequest("获取最小冲突时间失败");
+            }
         }
     }
 
