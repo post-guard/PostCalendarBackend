@@ -13,6 +13,7 @@ import top.rrricardo.postcalendarbackend.mappers.UserMapper;
 import top.rrricardo.postcalendarbackend.models.Group;
 import top.rrricardo.postcalendarbackend.models.GroupLink;
 import top.rrricardo.postcalendarbackend.models.User;
+import top.rrricardo.postcalendarbackend.services.LoggingService;
 import top.rrricardo.postcalendarbackend.services.SystemAlarmService;
 import top.rrricardo.postcalendarbackend.services.SystemClockService;
 import top.rrricardo.postcalendarbackend.services.UserService;
@@ -26,6 +27,7 @@ public class SetupComponent implements CommandLineRunner {
     private final GroupLinkMapper groupLinkMapper;
     private final SystemClockService systemClockService;
     private final SystemAlarmService systemAlarmService;
+    private final LoggingService loggingService;
     private final Logger logger;
 
     @Value("${user.rootUserEmailAddress}")
@@ -48,19 +50,22 @@ public class SetupComponent implements CommandLineRunner {
                           GroupMapper groupMapper,
                           GroupLinkMapper groupLinkMapper,
                           SystemClockService systemClockService,
-                          SystemAlarmService systemAlarmService) {
+                          SystemAlarmService systemAlarmService,
+                          LoggingService loggingService) {
         this.userMapper = userMapper;
         this.userService = userService;
         this.groupMapper = groupMapper;
         this.groupLinkMapper = groupLinkMapper;
         this.systemClockService = systemClockService;
         this.systemAlarmService = systemAlarmService;
+        this.loggingService = loggingService;
         logger = LoggerFactory.getLogger(SetupComponent.class);
     }
 
     @Override
     public void run(String... args) {
         systemClockService.start();
+        loggingService.start();
 
         // 创建默认用户组
         var usersGroup = groupMapper.getGroupByName(usersGroupName);
