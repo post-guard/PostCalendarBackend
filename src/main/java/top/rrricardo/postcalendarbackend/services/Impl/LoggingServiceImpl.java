@@ -1,12 +1,13 @@
 package top.rrricardo.postcalendarbackend.services.Impl;
 
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.stereotype.Service;
 import top.rrricardo.postcalendarbackend.commons.LoggingQueue;
 import top.rrricardo.postcalendarbackend.services.LoggingService;
 import top.rrricardo.postcalendarbackend.websockets.LoggingWebSocketServer;
 
 @Service
-public class LoggingServiceImpl implements LoggingService {
+public class LoggingServiceImpl implements LoggingService, DisposableBean {
 
     private boolean running = false;
 
@@ -31,5 +32,10 @@ public class LoggingServiceImpl implements LoggingService {
         });
 
         thread.start();
+    }
+
+    @Override
+    public void destroy() {
+        running = false;
     }
 }
