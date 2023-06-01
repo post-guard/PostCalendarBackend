@@ -94,7 +94,7 @@ public class SystemAlarmServiceImpl implements SystemAlarmService, DisposableBea
                     // 当天已经在刷新时间之后
                     if (refreshDate == null) {
                         logger.info("刷新闹钟队列日期: {}", today);
-                        refreshAlarms(today);
+                        refreshAlarms();
                         refreshDate = today;
                     } else {
                         while (today.isAfter(refreshDate)) {
