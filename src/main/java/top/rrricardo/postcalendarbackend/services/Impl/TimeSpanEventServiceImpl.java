@@ -214,6 +214,12 @@ public class TimeSpanEventServiceImpl implements TimeSpanEventService {
 
     @Override
     public CustomList<TimeSpanEvent> queryUserEvent(int id, LocalDateTime begin, LocalDateTime end) throws TimeSpanEventException {
+        var user = userMapper.getUserById(id);
+
+        if (user == null) {
+            throw new TimeSpanEventException("查询的用户不存在");
+        }
+
         var result = queryEventHelper(userEventForest, id, begin, end);
 
         // 查询用户事件的同时查询用户所在组织的事件
@@ -229,6 +235,12 @@ public class TimeSpanEventServiceImpl implements TimeSpanEventService {
 
     @Override
     public CustomList<TimeSpanEvent> queryGroupEvent(int id, LocalDateTime begin, LocalDateTime end) throws TimeSpanEventException {
+        var group = groupMapper.getGroupById(id);
+
+        if (group == null) {
+            throw new TimeSpanEventException("查询的组织不存在");
+        }
+
         return queryEventHelper(groupEventForest, id, begin, end);
     }
 
@@ -402,15 +414,13 @@ public class TimeSpanEventServiceImpl implements TimeSpanEventService {
      * @param begin  开始时间
      * @param end    结束时间
      * @return 在时间段内的事件列表
-     * @throws TimeSpanEventException 查询不存在的用户/组织引发的错误
      */
     private CustomList<TimeSpanEvent> queryEventHelper(CustomHashTable<Integer, AvlTree<TimeSpanEvent>> forest,
-                                                       int id, LocalDateTime begin, LocalDateTime end)
-            throws TimeSpanEventException {
+                                                       int id, LocalDateTime begin, LocalDateTime end) {
         var tree = forest.get(id);
 
         if (tree == null) {
-            throw new TimeSpanEventException("属主：" + id + "不存在");
+            return new CustomList<>();
         }
 
         var beginTimeObj = new TimeSpanEvent();
@@ -481,9 +491,10 @@ public class TimeSpanEventServiceImpl implements TimeSpanEventService {
 
     /**
      * 判断给指定用户添加事件是否发生冲突的辅助函数
-     * @param event 需要添加的事件
+     *
+     * @param event  需要添加的事件
      * @param userId 添加事件的用户
-     * @param tree 即将添加的树
+     * @param tree   即将添加的树
      */
     private void judgeUserConflictHelper(TimeSpanEvent event, int userId, AvlTree<TimeSpanEvent> tree)
             throws TimeConflictException {
@@ -505,15 +516,16 @@ public class TimeSpanEventServiceImpl implements TimeSpanEventService {
 
     /**
      * 判断给指定组织添加事件是否发生冲突的辅助函数
-     * @param event 需要添加的事件
+     *
+     * @param event   需要添加的事件
      * @param groupId 添加事件的用户
-     * @param tree 即将添加的树
+     * @param tree    即将添加的树
      * @throws TimeConflictException 如果发生冲突引发的异常
      */
     private void judgeGroupConflictHelper(TimeSpanEvent event, int groupId, AvlTree<TimeSpanEvent> tree)
-        throws TimeConflictException {
+            throws TimeConflictException {
         if (judgeConflictHelper(event, tree)) {
-            throw new TimeConflictException(0 ,groupId,
+            throw new TimeConflictException(0, groupId,
                     event.getBeginDateTime(), event.getEndDateTime());
         }
 
