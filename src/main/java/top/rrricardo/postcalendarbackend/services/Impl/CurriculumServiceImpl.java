@@ -9,54 +9,58 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import top.rrricardo.postcalendarbackend.dtos.CurriculumLoginDTO;
+import top.rrricardo.postcalendarbackend.dtos.SemesterDTO;
 import top.rrricardo.postcalendarbackend.exceptions.CurriculumServiceException;
 import top.rrricardo.postcalendarbackend.models.Course;
-import top.rrricardo.postcalendarbackend.models.TimeSpanEvent;
 import top.rrricardo.postcalendarbackend.services.CurriculumService;
-import top.rrricardo.postcalendarbackend.utils.generic.CustomHashTable;
-import top.rrricardo.postcalendarbackend.utils.generic.CustomList;
+import top.rrricardo.postcalendarbackend.services.TimeSpanEventService;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CurriculumServiceImpl implements CurriculumService {
-    private final CustomHashTable<String, LocalDateTime> semesterMap = new CustomHashTable<>();
     private final static String baseUrl = "https://jwgl.bupt.edu.cn/jsxsd/";
     private final Logger logger;
     private final ObjectMapper objectMapper;
+    private final TimeSpanEventService timeSpanEventService;
+    private static final Map<String, LocalDate> semesterMap = Map.of(
+            "2021-2022-1", LocalDate.of(2021, Month.APRIL, 30),
+            "2021-2022-2", LocalDate.of(2022, Month.FEBRUARY, 28),
+            "2022-2023-1", LocalDate.of(2022, Month.APRIL, 22),
+            "2022-2023-2", LocalDate.of(2023, Month.FEBRUARY, 20)
+    );
+    private static final List<SemesterDTO> semesterList = new ArrayList<>();
 
-    public CurriculumServiceImpl() {
-        var semester1 = LocalDateTime.of(2021, Month.APRIL, 30, 0, 0);
-        var semester2 = LocalDateTime.of(2022, Month.FEBRUARY, 28, 0, 0);
-        var semester3 = LocalDateTime.of(2022, Month.APRIL, 22, 0, 0);
-        var semester4 = LocalDateTime.of(2023, Month.FEBRUARY, 20, 0, 0);
-
-        semesterMap.put("2021-2022-1", semester1);
-        semesterMap.put("2021-2022-2", semester2);
-        semesterMap.put("2022-2023-1", semester3);
-        semesterMap.put("2022-2023-2", semester4);
-
+    public CurriculumServiceImpl(TimeSpanEventService timeSpanEventService) {
         logger = LoggerFactory.getLogger(getClass());
         objectMapper = new ObjectMapper();
+        this.timeSpanEventService = timeSpanEventService;
+
+        for (var pair : semesterMap.entrySet()) {
+            var semester = new SemesterDTO();
+            semester.setSemester(pair.getKey());
+            semester.setStartTime(LocalDateTime.of(pair.getValue(), LocalTime.MIN));
+            semesterList.add(semester);
+        }
     }
 
     @Override
     public LocalDate getSemesterBeginTime(String semesterString) {
-        return semesterMap.get(semesterString).toLocalDate();
+        return semesterMap.get(semesterString);
     }
 
     @Override
-    public CustomList<TimeSpanEvent> getCurriculums(String semesterString, CurriculumLoginDTO loginDTO)
+    public void getCurriculums(String semesterString, CurriculumLoginDTO loginDTO)
             throws CurriculumServiceException {
-        var result = new CustomList<TimeSpanEvent>();
-
         // 首先登录教务系统
         var client = new OkHttpClient.Builder()
                 .followRedirects(false)
@@ -111,20 +115,25 @@ public class CurriculumServiceImpl implements CurriculumService {
             throw new CurriculumServiceException();
         }
 
+        try {
+            var courses = analyseExcel(excelStream);
 
-        var courses = analyseExcel(excelStream);
-
-        if (courses != null) {
-            for (var course : courses) {
-                var events = course.toTimeSpanEvent(getSemesterBeginTime(semesterString), loginDTO.getUserId());
-
-                for (var event : events) {
-                    result.add(event);
+            if (courses != null) {
+                for (var course : courses) {
+                    for (var event : course.toTimeSpanEvent(getSemesterBeginTime(semesterString), loginDTO.getUserId())) {
+                        timeSpanEventService.addUserEvent(event);
+                    }
                 }
             }
+        } catch (Exception exception) {
+            logger.error("解析并写入输入库出错", exception);
+            throw new CurriculumServiceException();
         }
+    }
 
-        return result;
+    @Override
+    public List<SemesterDTO> getSemester() {
+        return semesterList;
     }
 
     /**
@@ -144,13 +153,16 @@ public class CurriculumServiceImpl implements CurriculumService {
         var lines = cellString.split("\n");
         var courses = new ArrayList<Course>();
 
+        int[] weeks, classes;
+        Course course;
+
         switch (lines.length) {
-            case 6:
+            case 6 -> {
                 // 只有一门课程的单元格
                 // 没有分组
-                int[] weeks = Course.parseWeeksString(lines[3]);
-                int[] classes = Course.parseTimeString(lines[5]);
-                var course = new Course(
+                weeks = Course.parseWeeksString(lines[3]);
+                classes = Course.parseTimeString(lines[5]);
+                course = new Course(
                         lines[1],
                         lines[2],
                         lines[4],
@@ -160,9 +172,8 @@ public class CurriculumServiceImpl implements CurriculumService {
                         dayOfWeek
                 );
                 courses.add(course);
-
-                break;
-            case 7:
+            }
+            case 7 -> {
                 // 只有一门课程的单元格
                 // 含有分组
                 weeks = Course.parseWeeksString(lines[4]);
@@ -177,9 +188,8 @@ public class CurriculumServiceImpl implements CurriculumService {
                         dayOfWeek
                 );
                 courses.add(course);
-
-                break;
-            case 11:
+            }
+            case 11 -> {
                 // 含有两门课程的单元格
                 // 均没有分组
                 weeks = Course.parseWeeksString(lines[3]);
@@ -194,7 +204,6 @@ public class CurriculumServiceImpl implements CurriculumService {
                         dayOfWeek
                 );
                 courses.add(course);
-
                 weeks = Course.parseWeeksString(lines[8]);
                 classes = Course.parseTimeString(lines[10]);
                 course = new Course(
@@ -207,9 +216,8 @@ public class CurriculumServiceImpl implements CurriculumService {
                         dayOfWeek
                 );
                 courses.add(course);
-
-                break;
-            case 12:
+            }
+            case 12 -> {
                 // 含有两门课程的单元格
                 // 有一门课程有分组
                 // 通过第五行是否存在”节“来判断
@@ -242,7 +250,6 @@ public class CurriculumServiceImpl implements CurriculumService {
                     );
                     courses.add(course);
 
-                    break;
                 } else {
                     // 第一门有分组
                     weeks = Course.parseWeeksString(lines[4]);
@@ -273,9 +280,9 @@ public class CurriculumServiceImpl implements CurriculumService {
                     );
                     courses.add(course);
 
-                    break;
                 }
-            case 13:
+            }
+            case 13 -> {
                 // 含有两门课程的单元格
                 // 均有分组
                 weeks = Course.parseWeeksString(lines[4]);
@@ -290,7 +297,6 @@ public class CurriculumServiceImpl implements CurriculumService {
                         dayOfWeek
                 );
                 courses.add(course);
-
                 weeks = Course.parseWeeksString(lines[10]);
                 classes = Course.parseTimeString(lines[12]);
                 course = new Course(
@@ -303,9 +309,8 @@ public class CurriculumServiceImpl implements CurriculumService {
                         dayOfWeek
                 );
                 courses.add(course);
-
-                break;
-            case 16:
+            }
+            case 16 -> {
                 // 含有三类型的的课程
                 // 没有分组
                 weeks = Course.parseWeeksString(lines[3]);
@@ -320,7 +325,6 @@ public class CurriculumServiceImpl implements CurriculumService {
                         dayOfWeek
                 );
                 courses.add(course);
-
                 weeks = Course.parseWeeksString(lines[8]);
                 classes = Course.parseTimeString(lines[10]);
                 course = new Course(
@@ -333,7 +337,6 @@ public class CurriculumServiceImpl implements CurriculumService {
                         dayOfWeek
                 );
                 courses.add(course);
-
                 weeks = Course.parseWeeksString(lines[13]);
                 classes = Course.parseTimeString(lines[15]);
                 course = new Course(
@@ -346,9 +349,8 @@ public class CurriculumServiceImpl implements CurriculumService {
                         dayOfWeek
                 );
                 courses.add(course);
-                break;
-            default:
-                throw new IllegalArgumentException("解析单元格失败");
+            }
+            default -> throw new IllegalArgumentException("解析单元格失败");
         }
 
         return courses;
