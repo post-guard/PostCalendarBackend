@@ -507,6 +507,11 @@ public class TimeSpanEventServiceImpl implements TimeSpanEventService {
         for (var groupLink : groupLinks) {
             var groupTree = groupEventForest.get(groupLink.getGroupId());
 
+            if (groupTree == null) {
+                // 判断组织树是否存在
+                continue;
+            }
+
             if (judgeConflictHelper(event, groupTree)) {
                 throw new TimeConflictException(0, groupLink.getGroupId(),
                         event.getBeginDateTime(), event.getEndDateTime());

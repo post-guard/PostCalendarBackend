@@ -171,7 +171,7 @@ public class TimePointEventServiceImpl implements TimePointEventService {
 
     @Override
     public void updateGroupEvent(TimePointEvent event) throws TimePointEventException, TimeConflictException {
-        var groupId = event.getUserId();
+        var groupId = event.getGroupId();
 
         var group = groupMapper.getGroupById(groupId);
         if (group == null) {
