@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService {
         var link = new GroupLink(
                 user.getId(),
                 Common.DefaultUsersGroupId,
-                UserPermission.SUPER
+                UserPermission.USER
         );
         groupLinkMapper.createGroupLink(link);
 
